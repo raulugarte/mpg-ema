@@ -1,0 +1,40 @@
+{
+  "variantName": "carousel-slider",
+  "baseBlock": "carousel",
+  "version": "1.0.0",
+  "created": "2026-07-03T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.mpg.de/en",
+    "originPage": "Max Planck Society homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "spacious",
+    "purpose": "rotating-teaser-slider",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "per-slide image + rich text (label/title/description/link), prev-next navigation",
+    "buttonCount": 2,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "publications sliders",
+      "video/multimedia teaser sliders",
+      "'from the institutes' news sliders",
+      "related / 'other interesting' article teaser sliders",
+      "any horizontally rotating gallery of teasers"
+    ],
+    "notSuitableFor": [
+      "static grids that should show all items at once (use cards-teaser)",
+      "single hero feature"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/en", "/26798800/democracy-cannot-be-taken-for-granted"],
+    "reuseCount": 2,
+    "lastUsed": "2026-07-03T12:44:00.000Z"
+  }
+}

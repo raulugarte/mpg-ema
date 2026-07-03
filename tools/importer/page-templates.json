@@ -1,0 +1,196 @@
+{
+  "metadata": {
+    "projectType": "xwalk"
+  },
+  "templates": [
+    {
+      "name": "homepage",
+      "urls": [
+        "https://www.mpg.de/en"
+      ],
+      "representativeUrl": "https://www.mpg.de/en",
+      "coverageGaps": [],
+      "description": "Max Planck Society homepage: hero teaser, news/research highlight grids (cards), topic promo bands, image/video sliders, and social posts.",
+      "sections": [
+        {
+          "id": "rc2",
+          "name": "hero",
+          "selector": "#page_content > main > div.container-full-width.background-block.teaser-hero"
+        },
+        {
+          "id": "rc3",
+          "name": "text-teasers",
+          "selector": "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(2)"
+        },
+        {
+          "id": "rc4",
+          "name": "news",
+          "selector": "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(3)",
+          "style": "grey"
+        },
+        {
+          "id": "rc5",
+          "name": "international",
+          "selector": "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(4)"
+        },
+        {
+          "id": "rc6",
+          "name": "career",
+          "selector": "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(5)",
+          "style": "grey"
+        },
+        {
+          "id": "rc7",
+          "name": "topic-specials",
+          "selector": "#page_content > main > div.responsive_column.container-full-width.primary",
+          "style": "primary"
+        },
+        {
+          "id": "rc8",
+          "name": "publications",
+          "selector": "#page_content > main > div.container-full-width.white:nth-of-type(7)"
+        },
+        {
+          "id": "rc9",
+          "name": "from-the-institutes",
+          "selector": "#page_content > main > div.container-full-width.grey:nth-of-type(8)",
+          "style": "grey"
+        },
+        {
+          "id": "rc10",
+          "name": "events",
+          "selector": "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(9)"
+        },
+        {
+          "id": "rc11",
+          "name": "multimedia",
+          "selector": "#page_content > main > div.container-full-width.homepage_slider.grey",
+          "style": "grey"
+        },
+        {
+          "id": "rc12",
+          "name": "social-media",
+          "selector": "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(11)"
+        }
+      ],
+      "blocks": [
+        {
+          "name": "section-news",
+          "instances": [
+            "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(3)"
+          ],
+          "section": "grey"
+        },
+        {
+          "name": "section-career",
+          "instances": [
+            "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(5)"
+          ],
+          "section": "grey"
+        },
+        {
+          "name": "section-topic-specials",
+          "instances": [
+            "#page_content > main > div.responsive_column.container-full-width.primary"
+          ],
+          "section": "primary"
+        },
+        {
+          "name": "section-institutes",
+          "instances": [
+            "#page_content > main > div.container-full-width.grey:nth-of-type(8)"
+          ],
+          "section": "grey"
+        },
+        {
+          "name": "section-multimedia",
+          "instances": [
+            "#page_content > main > div.container-full-width.homepage_slider.grey"
+          ],
+          "section": "grey"
+        },
+        {
+          "name": "hero-teaser",
+          "instances": [
+            "#page_content > main > div.container-full-width.background-block.teaser-hero"
+          ]
+        },
+        {
+          "name": "cards-teaser",
+          "instances": [
+            "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(2)",
+            "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(3)",
+            "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(4)",
+            "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(5)",
+            "#page_content > main > div.responsive_column.container-full-width.primary",
+            "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(9)"
+          ]
+        },
+        {
+          "name": "carousel-slider",
+          "instances": [
+            "#page_content > main > div.container-full-width.white:nth-of-type(7) div.slick-slider.row",
+            "#page_content > main > div.container-full-width.grey:nth-of-type(8) div.slick-slider.row",
+            "#page_content > main > div.container-full-width.homepage_slider.grey div.slick-slider.row.homepage-slider"
+          ]
+        },
+        {
+          "name": "columns-social",
+          "instances": [
+            "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(11)"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "article",
+      "urls": [
+        "https://www.mpg.de/26798800/democracy-cannot-be-taken-for-granted"
+      ],
+      "representativeUrl": "https://www.mpg.de/26798800/democracy-cannot-be-taken-for-granted",
+      "coverageGaps": [],
+      "description": "Max Planck Society article/detail page: single-column article body (title, subtitle, meta info, inline figures with captions, rich text paragraphs and lists) followed by a grey 'Other Interesting Articles' related-articles slider.",
+      "sections": [
+        {
+          "id": "rc2",
+          "name": "article-body",
+          "selector": "#page_content > div.container.content-wrapper > div.row > main > article.col-md-9.col-md-push-3 > div.content:nth-of-type(2)",
+          "style": null,
+          "blocks": [],
+          "defaultContent": [
+            "#page_content > div.container.content-wrapper > div.row > main > article.col-md-9.col-md-push-3 > div.content:nth-of-type(2)"
+          ]
+        },
+        {
+          "id": "rc3",
+          "name": "related-articles",
+          "selector": "#page_content > div.container-full-width.grey.hidden-print",
+          "style": "grey",
+          "blocks": ["carousel-slider"],
+          "defaultContent": []
+        }
+      ],
+      "blocks": [
+        {
+          "name": "article-aside",
+          "instances": [
+            "#page_content > div.container.content-wrapper > div.row > aside.sidebar"
+          ]
+        },
+        {
+          "name": "section-related-articles",
+          "instances": [
+            "#page_content > div.container-full-width.grey.hidden-print"
+          ],
+          "section": "grey"
+        },
+        {
+          "name": "carousel-slider",
+          "instances": [
+            "#related-articles-container"
+          ]
+        }
+      ]
+    }
+  ]
+}

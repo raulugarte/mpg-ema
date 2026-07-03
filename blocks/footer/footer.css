@@ -1,20 +1,132 @@
+/* MPG footer — green useful-links/social/buttons band + darkgreen legal bar */
+
 footer {
-  background-color: var(--light-color);
   font-size: var(--body-font-size-xs);
 }
 
-footer .footer > div {
-  margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
+/* --- Green band --- */
+footer .footer-green {
+  position: relative;
+  background-color: var(--brand-green, #006c66);
+  color: #fff;
 }
 
-footer .footer p {
+footer .footer-container {
+  max-width: 1170px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+footer .footer-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+footer .footer-column {
+  flex: 1 1 220px;
+  min-width: 200px;
+}
+
+footer .footer-column h2 {
+  margin: 0 0 12px;
+  color: #fff;
+  font-family: var(--heading-font-family);
+  font-size: 18px;
+  font-weight: 400;
+}
+
+footer .footer-column ul {
+  list-style: none;
   margin: 0;
+  padding: 0;
 }
 
-@media (width >= 900px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
+footer .footer-column li {
+  margin: 0 0 8px;
+}
+
+footer .footer-column a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+footer .footer-column a:hover {
+  text-decoration: underline;
+}
+
+/* back-to-top */
+footer .footer-top {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  border: 1px solid rgb(255 255 255 / 50%);
+  border-radius: 2px;
+  padding: 4px 12px;
+}
+
+footer .footer-top::before {
+  content: '\2191';
+  margin-right: 6px;
+}
+
+footer .footer-top:hover {
+  background: rgb(255 255 255 / 15%);
+}
+
+/* --- Darkgreen legal bar --- */
+footer .footer-subfooter {
+  background-color: var(--brand-dark-green, #055);
+  color: #fff;
+}
+
+footer .footer-subfooter .footer-container {
+  padding: 15px 24px;
+}
+
+footer .footer-subfooter ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+footer .footer-subfooter a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+footer .footer-subfooter a:hover {
+  text-decoration: underline;
+}
+
+/* --- Mobile --- */
+@media (width <= 899px) {
+  footer .footer-container {
+    padding: 32px 16px;
+  }
+
+  footer .footer-columns {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  footer .footer-top {
+    position: static;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+
+  footer .footer-subfooter ul {
+    flex-direction: column;
+    gap: 12px;
   }
 }

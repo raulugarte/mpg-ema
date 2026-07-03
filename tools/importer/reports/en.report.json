@@ -1,0 +1,21 @@
+{
+  "status": "success",
+  "url": "https://www.mpg.de/en",
+  "path": "en",
+  "timestamp": "2026-07-03T13:10:15.881Z",
+  "title": "Homepage | Max-Planck-Gesellschaft",
+  "template": "homepage",
+  "blocks": [
+    "hero-teaser",
+    "cards-teaser",
+    "cards-teaser",
+    "cards-teaser",
+    "cards-teaser",
+    "cards-teaser",
+    "cards-teaser",
+    "carousel-slider",
+    "carousel-slider",
+    "carousel-slider",
+    "columns-social"
+  ]
+}

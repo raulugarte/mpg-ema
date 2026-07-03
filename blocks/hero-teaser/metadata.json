@@ -1,0 +1,38 @@
+{
+  "variantName": "hero-teaser",
+  "baseBlock": "hero",
+  "version": "1.0.0",
+  "created": "2026-07-03T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.mpg.de/en",
+    "originPage": "Max Planck Society homepage",
+    "blockPosition": "top"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "dark",
+    "density": "spacious",
+    "purpose": "feature-story-hero",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "background image + headline + caption + CTA",
+    "buttonCount": 1,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "homepage top feature teasers",
+      "landing pages with a full-bleed background photo",
+      "story/campaign hero banners"
+    ],
+    "notSuitableFor": [
+      "text-only intros without a background image",
+      "sections needing multiple content columns below the headline"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/en"],
+    "reuseCount": 1,
+    "lastUsed": "2026-07-03T00:00:00.000Z"
+  }
+}

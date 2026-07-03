@@ -1,0 +1,11 @@
+{
+  "type": "xwalk",
+  "sites": {
+    "mpg-ema": {
+      "previewOrg": "raulugarte",
+      "previewSite": "mpg-ema",
+      "baseUrl": "https://www.mpg.de/en",
+      "libraryUrl": "https://main--sta-xwalk-boilerplate--aemysites.aem.page/tools/sidekick/library.json"
+    }
+  }
+}

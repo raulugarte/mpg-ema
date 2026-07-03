@@ -1,0 +1,234 @@
+/* ==========================================================================
+   Max Planck Society — carousel-slider
+   Two variants share one block name:
+   - Publications: filmstrip of cover images (image cell + empty content cell)
+   - Multimedia:   poster cards (image cell + text content cell)
+   Values extracted from https://www.mpg.de/en computed styles.
+   ========================================================================== */
+
+/* The block IS a full-width band. Break out of the section max-width and
+   paint the band background across the viewport.  Source band padding
+   is 32px top / 49px bottom. */
+.carousel-slider-wrapper {
+  max-width: 100% !important;
+  padding: 0 !important;
+}
+
+.carousel-slider {
+  padding: 32px 0 49px;
+  background-color: var(--background-color); /* white — Publications default */
+}
+
+/* Grey band variant (Multimedia / From the Institutes) */
+.carousel-slider.grey,
+.section.grey .carousel-slider {
+  background-color: var(--grey-color); /* #eee */
+}
+
+/* Section heading (h2) rendered as default content just above the block —
+   Merriweather 34px, green, matching source. Handled by section styling,
+   but ensure the block's own inner heading (if any) matches. */
+.carousel-slider h2 {
+  max-width: var(--content-max-width, 1170px);
+  margin: 15px auto 8px;
+  padding: 0 55px;
+  font-family: var(--heading-font-family);
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--brand-green);
+}
+
+/* Centered content rail with room on the sides for the arrows (source uses
+   .container margin 0 55px inside a 1170 max-width). */
+.carousel-slider .carousel-slider-slides-container {
+  position: relative;
+  max-width: var(--content-max-width, 1170px);
+  margin: 0 auto;
+  padding: 0 55px;
+}
+
+.carousel-slider .carousel-slider-slides,
+.carousel-slider .carousel-slider-slide-indicators {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Horizontal filmstrip: slides sit side by side and scroll/snap on the x-axis. */
+.carousel-slider .carousel-slider-slides {
+  display: flex;
+  gap: 0;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  overflow: scroll clip;
+}
+
+.carousel-slider .carousel-slider-slides::-webkit-scrollbar {
+  display: none;
+}
+
+/* Each slide is auto-height and a fixed narrow width so several show at once.
+   Default (Multimedia poster card): 367px slide, 337px image + 15px gutters. */
+.carousel-slider .carousel-slider-slide {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: 367px;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  position: relative;
+  min-height: 0;
+  padding: 0 15px;
+}
+
+/* --- Image cell (both variants) --- */
+.carousel-slider .carousel-slider-slide-image {
+  position: relative;
+  margin: 0;
+}
+
+.carousel-slider .carousel-slider-slide-image p {
+  margin: 0;
+}
+
+.carousel-slider .carousel-slider-slide-image picture,
+.carousel-slider .carousel-slider-slide-image a {
+  display: block;
+}
+
+.carousel-slider .carousel-slider-slide-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* --- Content cell (Multimedia) --- */
+.carousel-slider .carousel-slider-slide-content {
+  padding: 20px 0 10px;
+  color: var(--text-color);
+  font-size: var(--body-font-size-m);
+  line-height: 1.5;
+}
+
+.carousel-slider .carousel-slider-slide-content h3,
+.carousel-slider .carousel-slider-slide-content h4 {
+  margin: 0 0 4px;
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-l); /* 20px */
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--brand-green);
+}
+
+.carousel-slider .carousel-slider-slide-content h3 a,
+.carousel-slider .carousel-slider-slide-content h4 a {
+  color: var(--brand-green);
+}
+
+.carousel-slider .carousel-slider-slide-content p {
+  margin: 4px 0 0;
+}
+
+/* =====================  PUBLICATIONS variant  ============================
+   Slides where the content cell is empty are cover-image slides: narrower
+   width (184px slide, 154px image), no card body. */
+.carousel-slider .carousel-slider-slide:has(.carousel-slider-slide-content:empty) {
+  width: 184px;
+}
+
+.carousel-slider .carousel-slider-slide:has(.carousel-slider-slide-content:empty) .carousel-slider-slide-image img {
+  width: 154px;
+  margin: 0 auto;
+}
+
+.carousel-slider .carousel-slider-slide .carousel-slider-slide-content:empty {
+  display: none;
+}
+
+/* ==========================  Navigation arrows  ==========================
+   Source arrows are large green (opacity .75) chevrons sitting just outside
+   the rail (left/right ~ -25px from the .container). */
+.carousel-slider .carousel-slider-navigation-buttons {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.carousel-slider .carousel-slider-navigation-buttons button {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.carousel-slider .carousel-slider-navigation-buttons button:hover,
+.carousel-slider .carousel-slider-navigation-buttons button:focus,
+.carousel-slider .carousel-slider-navigation-buttons button:focus-visible {
+  background: none;
+}
+
+/* Chevron glyphs drawn with borders, green at 75% opacity like the source. */
+.carousel-slider .carousel-slider-navigation-buttons button::after {
+  display: block;
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  border: 4px solid var(--brand-green);
+  border-bottom: 0;
+  border-left: 0;
+  opacity: 0.75;
+}
+
+.carousel-slider .carousel-slider-navigation-buttons button.slide-prev::after {
+  transform: translate(-30%, -50%) rotate(-135deg);
+}
+
+.carousel-slider .carousel-slider-navigation-buttons button.slide-next::after {
+  transform: translate(-70%, -50%) rotate(45deg);
+}
+
+.carousel-slider .carousel-slider-navigation-buttons button:hover::after,
+.carousel-slider .carousel-slider-navigation-buttons button:focus-visible::after {
+  opacity: 1;
+}
+
+/* Hide the default dot indicators — source uses only arrows on these sliders. */
+.carousel-slider .carousel-slider-slide-indicators {
+  display: none;
+}
+
+/* ==============================  Mobile  =================================
+   On narrow screens the slides simply become swipeable at reduced width. */
+@media (width <= 700px) {
+  .carousel-slider .carousel-slider-slides-container {
+    padding: 0 32px;
+  }
+
+  .carousel-slider .carousel-slider-slide {
+    width: 70%;
+  }
+
+  .carousel-slider .carousel-slider-slide:has(.carousel-slider-slide-content:empty) {
+    width: 40%;
+  }
+}

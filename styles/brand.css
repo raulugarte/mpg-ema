@@ -1,0 +1,28 @@
+/* Brand tokens extracted from https://www.mpg.de/en (Max Planck Society) */
+:root {
+  /* fonts */
+  --heading-font-family: "Merriweather", georgia, serif;
+  --body-font-family: "Roboto", tahoma, arial, sans-serif;
+
+  /* colors */
+  --background-color: #fff;
+  --text-color: #49494b;
+  --link-color: #006c66;
+  --link-hover-color: #00201e;
+  --brand-green: #006c66;
+  --brand-dark-green: #055;
+  --grey-color: #eee;
+
+  /* spacing */
+  --section-padding: 20px;
+  --content-max-width: 1170px;
+  --nav-height: 64px;
+
+  /* heading sizes (desktop) */
+  --heading-size-xxl: 30px;
+  --heading-size-xl: 20px;
+  --heading-size-l: 20px;
+  --heading-size-m: 16px;
+  --heading-size-s: 14px;
+  --heading-size-xs: 14px;
+}

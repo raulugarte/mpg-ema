@@ -34,15 +34,42 @@
     ]
   },
   {
+    "id": "cards-teaser",
+    "components": [
+      "card"
+    ]
+  },
+  {
     "id": "cards",
     "components": [
       "card"
     ]
   },
   {
+    "id": "carousel-slider",
+    "components": [
+      "carousel-slider-item"
+    ]
+  },
+  {
     "id": "carousel",
     "components": [
       "carousel-item"
+    ]
+  },
+  {
+    "id": "columns-social",
+    "components": [
+      "column"
+    ]
+  },
+  {
+    "id": "column",
+    "components": [
+      "text",
+      "image",
+      "button",
+      "title"
     ]
   },
   {
