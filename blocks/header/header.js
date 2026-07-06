@@ -119,6 +119,20 @@ export default async function decorate(block) {
       const logo = paras[0].querySelector('a');
       if (logo) {
         logo.className = 'nav-logo';
+        // The logo SVG is served from the committed /icons folder rather than a
+        // fragment-relative image: SVG <img> tags in the plain fragment are
+        // dropped by md2jcr on AEM export, and content/images is not deployed.
+        // Rebuild (or fix) the logo image here so it renders in every environment.
+        let img = logo.querySelector('img');
+        if (!img) {
+          img = document.createElement('img');
+          logo.textContent = '';
+          logo.append(img);
+        }
+        img.src = '/icons/mpg-logo.svg';
+        if (!img.getAttribute('alt')) {
+          img.alt = 'Max Planck Society - go to homepage';
+        }
         navBrand.append(logo);
       }
     }
