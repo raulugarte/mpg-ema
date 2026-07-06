@@ -87,6 +87,19 @@ export default async function decorate(block) {
   const html = await resp.text();
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
+
+  // Resolve relative asset paths (e.g. the logo `images/mpg-logo.svg`) against the
+  // nav fragment's own URL, not the host page. Without this, a relative src resolves
+  // against the current page path and 404s on any page at a different depth. Mirrors
+  // the base-path reset in blocks/fragment/fragment.js so the behavior is consistent.
+  const fragmentBase = new URL(`${navPath}.plain.html`, window.location);
+  tmp.querySelectorAll('img[src]').forEach((img) => {
+    const src = img.getAttribute('src');
+    if (src && !src.startsWith('/') && !/^(https?:|data:)/i.test(src)) {
+      img.src = new URL(src, fragmentBase).href;
+    }
+  });
+
   const sections = [...tmp.children];
 
   const nav = document.createElement('nav');
