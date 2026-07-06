@@ -1,32 +1,32 @@
 {
-  "variantName": "hero-teaser",
-  "baseBlock": "hero",
+  "variantName": "cards-topic",
+  "baseBlock": "cards",
   "version": "1.0.0",
   "created": "2026-07-06T00:00:00.000Z",
   "sourceContext": {
     "originUrl": "https://www.mpg.de/en",
     "originPage": "Max Planck Society homepage",
-    "blockPosition": "top"
+    "blockPosition": "middle"
   },
   "visualCharacteristics": {
-    "colorScheme": "dark",
-    "density": "spacious",
-    "purpose": "hero",
+    "colorScheme": "accent",
+    "density": "compact",
+    "purpose": "topic",
     "imagePattern": "large"
   },
   "contentPattern": {
-    "structure": "background image + headline/quote + CTA",
-    "buttonCount": 1,
+    "structure": "image + title teaser cards on a brand-colored (primary) inverted background",
+    "buttonCount": 0,
     "imageCount": 1
   },
   "reuseGuidance": {
     "suitableFor": [
-      "homepage hero banners with a full-bleed background image",
-      "campaign landing pages with an overlaid quote/headline"
+      "topic/theme highlight rows on brand-colored sections",
+      "image+title card grids requiring inverted text styling"
     ],
     "notSuitableFor": [
-      "text-only intros without a background image",
-      "pages needing multiple content rows below the banner"
+      "cards on plain white/grey backgrounds",
+      "text-only teaser rows"
     ]
   },
   "usage": {

@@ -1,169 +1,123 @@
 /* eslint-disable */
 /* global WebImporter */
 /**
- * Parser for carousel-slider. Base block: carousel.
- * Sources:
- *   - https://www.mpg.de/en (homepage): Publications, From-the-Institutes, Multimedia sliders.
- *   - Article pages: "#related-articles-container" related-articles slider.
- * Generated for xwalk project (field-hinted output).
- *
- * xwalk container block. Model `carousel-slider-item` (blocks/carousel-slider/_carousel-slider.json):
- *   - media_image (reference) -> cell 1 (field:media_image). Slide image (mandatory when present).
- *   - media_imageAlt (collapsed) -> becomes the <img alt> attribute, no own cell/hint.
- *   - content_text (richtext) -> cell 2 (field:content_text). Optional title/description/CTA/date/tags.
- *
- * Each slide = 1 row, 2 cells. Empty cells carry NO field hint (per xwalk hinting rules).
- *
- * slick.js note: every source slider (homepage AND article) duplicates its real slides as
- * `.slick-slide.slick-cloned` (leading + trailing clones). Any slide contained in a
- * `.slick-cloned` ancestor is skipped so only unique slides are emitted.
- *
- * Variants handled (all share this parser):
- *   - "Publications" (homepage): each slide = a linked cover image (".pub-slider-item > a > picture > img"),
- *     no text -> image cell holds the linked <a>, text cell empty (no field hint).
- *   - "From the Institutes" (homepage): each slide (".box-color") = institute name (.box-header) + date
- *     (time.date) + heading link (a.h3) + more link (a.more). No image -> image cell empty.
- *   - "Multimedia" (homepage): each slide (".teaser.media-teaser") = linked poster image
- *     (.img-box a picture img) + title link (h3 a) + "Video" label + description + optional more link.
- *   - "related-articles" (article): each slide (".teaser.white") = linked image (.img-box a picture img)
- *     + title link (.meta-information h3 a) + date (.data .date) + tag links (.tags a) + description (p).
+ * Parser for carousel-slider. Base: carousel. Source: https://www.mpg.de/en
+ * Reused for 3 homepage sliders: Publications (linked cover images),
+ * From the Institutes (text teasers), Multimedia (thumbnail + linked title).
+ * xwalk container block. Filter carousel-slider -> carousel-slider-item.
+ *   item model (blocks/carousel-slider/_carousel-slider.json):
+ *     media_image (reference) + media_imageAlt (collapsed -> img alt) + content_text (richtext)
+ * Table: 2 columns. Row 1 = block name. Each subsequent row = one slide:
+ *   cell 1: image -> <!-- field:media_image --> (mandatory in library, may be empty for text slides)
+ *   cell 2: text  -> <!-- field:content_text --> (institute name/title/date/CTA or linked cover title)
+ * Slick duplicates slides as .slick-cloned; we exclude clones so each slide appears once.
+ * Gotcha avoided: for Multimedia slides that have BOTH image and text, image goes in
+ * cell 1 and richtext text in cell 2 — the richtext field never consumes past an <img>.
  */
 export default function parse(element, { document }) {
-  // Slide "root" for each variant. Each root represents exactly one slide's content.
-  //   - Publications: .pub-slider-item
-  //   - From-the-Institutes: .box-color
-  //   - Multimedia + related-articles (and any other .teaser slider): .teaser
-  // These class families are mutually exclusive, so the OR list never double-selects a slide.
-  let slideEls = Array.from(element.querySelectorAll(
-    ':scope .pub-slider-item, :scope .box-color, :scope .teaser',
-  ));
-
-  // Fallback for unforeseen slider markup: use slide wrappers directly.
-  if (slideEls.length === 0) {
-    slideEls = Array.from(element.querySelectorAll(':scope .slick-slide, :scope [class*="slider-item"]'));
+  // Section heading — each instance carries its own h2 ("Publications" /
+  // "From the Institutes" / "Multimedia"). Emitted as default content BEFORE the
+  // block table. Scoped to the container's direct .container child so we don't
+  // pick up a heading nested inside a slide.
+  const sectionTitleEl = element.querySelector(':scope > .container > h2, :scope > .container > h1, :scope h2.h1, :scope h2.invert');
+  let sectionHeading = null;
+  if (sectionTitleEl && sectionTitleEl.textContent.trim()) {
+    sectionHeading = document.createElement('h2');
+    sectionHeading.textContent = sectionTitleEl.textContent.trim();
   }
 
-  // Exclude slick.js clones (leading/trailing duplicates) so only unique slides are emitted.
-  slideEls = slideEls.filter((el) => !el.closest('.slick-cloned'));
+  // Real slides only (exclude slick clones). Falls back to raw markup where
+  // .slick-slide isn't present yet.
+  let slides = Array.from(element.querySelectorAll('.slick-slide:not(.slick-cloned)'));
+  if (slides.length === 0) {
+    slides = Array.from(element.querySelectorAll('.slick-slide'));
+  }
+  // Fallback for pre-hydration markup: use the item wrappers directly.
+  if (slides.length === 0) {
+    slides = Array.from(element.querySelectorAll('.pub-slider-item, .teaser, .box-color, .col-xs-12'));
+  }
 
-  const cells = [];
-
-  slideEls.forEach((slide) => {
-    // ---- CELL 1: media_image (field:media_image) ----
-    // The slide image, if any. Keep a wrapping <a> so the linked image is preserved.
-    const image = slide.querySelector('picture img, img');
-    const imageLink = image ? image.closest('a') : null;
-
-    let imageCell = '';
-    if (image) {
-      const frag = document.createDocumentFragment();
-      frag.appendChild(document.createComment(' field:media_image '));
-      frag.appendChild(imageLink || image);
-      imageCell = frag;
-    }
-
-    // ---- CELL 2: content_text (field:content_text) rich text ----
-    // Collect title/heading link, date, tags, description, and CTAs as clean rich text.
-    const textParts = [];
-
-    // Heading / title (may be an <a class="h3"> in institutes, or <h3><a> in teasers).
-    const headingLink = slide.querySelector(':scope > a.h3, .text-box > a.h3');
-    const headingEl = slide.querySelector('.text-box h3, .meta-information h3, h1, h2, h3, h4, .headline');
-    if (headingEl && !headingEl.closest('a')) {
-      // <h3> wrapping a link (teaser variants) or a plain heading.
-      textParts.push(headingEl);
-    } else if (headingLink) {
-      // Institutes variant: heading is a bare <a class="h3">. Wrap in an <h3> so it stays a heading.
-      const h = document.createElement('h3');
-      const a = document.createElement('a');
-      if (headingLink.getAttribute('href')) a.setAttribute('href', headingLink.getAttribute('href'));
-      a.textContent = headingLink.textContent.trim();
-      h.appendChild(a);
-      textParts.push(h);
-    }
-
-    // Institute name (From-the-Institutes .box-header) — small label above the heading.
-    const boxHeader = slide.querySelector(':scope > .box-header, .box-header');
-    if (boxHeader && boxHeader.textContent.trim()) {
-      const p = document.createElement('p');
-      p.textContent = boxHeader.textContent.trim();
-      // Prepend so the institute name sits above the heading (source order).
-      textParts.unshift(p);
-    }
-
-    // Date: <time class="date"> (institutes) or <span class="date"> inside .data (article).
-    const dateEl = slide.querySelector('time.date, .data .date, .date');
-    if (dateEl && dateEl.textContent.trim()) {
-      const p = document.createElement('p');
-      p.textContent = dateEl.textContent.trim();
-      textParts.push(p);
-    }
-
-    // Topic / label (e.g. "Video" in Multimedia).
-    const topicEl = slide.querySelector('.meta-information .topic, .data .topic, .topic, .label');
-    if (topicEl && topicEl.textContent.trim()) {
-      const p = document.createElement('p');
-      p.textContent = topicEl.textContent.trim();
-      textParts.push(p);
-    }
-
-    // Tags (article variant): render each tag as plain inline text in one paragraph,
-    // dropping site-specific classes. Preserve tag link text.
-    const tagLinks = Array.from(slide.querySelectorAll('.tags a'));
-    if (tagLinks.length > 0) {
-      const p = document.createElement('p');
-      tagLinks.forEach((a, i) => {
-        const span = document.createElement('a');
-        if (a.getAttribute('href')) span.setAttribute('href', a.getAttribute('href'));
-        span.textContent = a.textContent.trim();
-        if (i > 0) p.appendChild(document.createTextNode(', '));
-        p.appendChild(span);
-      });
-      textParts.push(p);
-    }
-
-    // Description paragraph(s): teaser .text-box > p, or a .description block.
-    const descEls = Array.from(slide.querySelectorAll(
-      ':scope .text-box > p, :scope > .description, :scope .text-box > .description',
-    ));
-    descEls.forEach((d) => {
-      if (!d.textContent.trim()) return;
-      const p = document.createElement('p');
-      p.textContent = d.textContent.trim();
-      textParts.push(p);
-    });
-
-    // "More" / CTA link that is not the image link and not the heading link.
-    const moreLink = slide.querySelector('a.more, .more-link a');
-    if (moreLink && moreLink !== imageLink && moreLink.textContent.trim()) {
-      const p = document.createElement('p');
-      const a = document.createElement('a');
-      if (moreLink.getAttribute('href')) a.setAttribute('href', moreLink.getAttribute('href'));
-      a.textContent = moreLink.textContent.trim();
-      p.appendChild(a);
-      textParts.push(p);
-    }
-
-    let textCell = '';
-    if (textParts.length > 0) {
-      const frag = document.createDocumentFragment();
-      frag.appendChild(document.createComment(' field:content_text '));
-      textParts.forEach((n) => frag.appendChild(n));
-      textCell = frag;
-    }
-
-    // Skip genuinely empty slides (no image and no text).
-    if (imageCell === '' && textCell === '') return;
-
-    cells.push([imageCell, textCell]);
-  });
-
-  // Empty-block guard: if nothing was extracted, unwrap the element.
-  if (cells.length === 0) {
+  if (slides.length === 0) {
     element.replaceWith(...element.childNodes);
     return;
   }
 
+  const cells = [];
+  slides.forEach((slide) => {
+    // --- Image (Publications cover / Multimedia thumbnail) ---
+    const image = slide.querySelector('picture img, img');
+
+    // --- Text teaser fields ---
+    // Institute band name (From the Institutes)
+    const boxHeader = slide.querySelector('.box-header');
+    // Linked title: a.h3 (Institutes), .text-box h3 a (Multimedia)
+    const titleLink = slide.querySelector('a.h3, .text-box h3 a, h3 a, h2 a');
+    // Date
+    const date = slide.querySelector('time.date, .date');
+    // Topic label (Multimedia: Video)
+    const topic = slide.querySelector('.topic');
+    // Description
+    const description = slide.querySelector('.description');
+    // "more" CTA
+    const more = slide.querySelector('a.more');
+    // Publications: the slide is just a linked cover image (no title text). The
+    // link href is preserved by keeping the anchor around the image in cell 1.
+    const coverLink = slide.querySelector('.pub-slider-item > a, a > picture');
+
+    // Build image cell
+    const imageCell = document.createDocumentFragment();
+    if (image) {
+      imageCell.appendChild(document.createComment(' field:media_image '));
+      imageCell.appendChild(image);
+    }
+
+    // Build text cell (richtext)
+    const textCell = document.createDocumentFragment();
+    const textParts = [];
+    if (boxHeader) {
+      const p = document.createElement('p');
+      p.textContent = boxHeader.textContent.trim();
+      textParts.push(p);
+    }
+    if (titleLink) {
+      const h = document.createElement('h3');
+      h.appendChild(titleLink);
+      textParts.push(h);
+    }
+    if (date) {
+      const p = document.createElement('p');
+      p.textContent = date.textContent.trim();
+      textParts.push(p);
+    }
+    if (topic) {
+      const p = document.createElement('p');
+      p.textContent = topic.textContent.trim();
+      textParts.push(p);
+    }
+    if (description) {
+      const p = document.createElement('p');
+      p.textContent = description.textContent.trim();
+      textParts.push(p);
+    }
+    if (more) {
+      const p = document.createElement('p');
+      p.appendChild(more);
+      textParts.push(p);
+    }
+
+    if (textParts.length > 0) {
+      textCell.appendChild(document.createComment(' field:content_text '));
+      textParts.forEach((el) => textCell.appendChild(el));
+    }
+
+    cells.push([imageCell, textCell]);
+  });
+
   const block = WebImporter.Blocks.createBlock(document, { name: 'carousel-slider', cells });
-  element.replaceWith(block);
+
+  // Emit section heading (before) as default content preceding the block table.
+  const out = [];
+  if (sectionHeading) out.push(sectionHeading);
+  out.push(block);
+  element.replaceWith(...out);
 }

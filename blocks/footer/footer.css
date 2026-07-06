@@ -1,4 +1,4 @@
-/* MPG footer — green useful-links/social/buttons band + darkgreen legal bar */
+/* MPG footer — green useful-links/social/explore band + darkgreen legal bar */
 
 footer {
   font-size: var(--body-font-size-xs);
@@ -80,7 +80,7 @@ footer .footer-top:hover {
 
 /* --- Darkgreen legal bar --- */
 footer .footer-subfooter {
-  background-color: var(--brand-dark-green, #055);
+  background-color: var(--brand-dark-green, #005550);
   color: #fff;
 }
 
@@ -88,10 +88,8 @@ footer .footer-subfooter .footer-container {
   padding: 15px 24px;
 }
 
-footer .footer-subfooter ul {
-  list-style: none;
+footer .footer-subfooter p {
   margin: 0;
-  padding: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
@@ -125,7 +123,7 @@ footer .footer-subfooter a:hover {
     margin-bottom: 20px;
   }
 
-  footer .footer-subfooter ul {
+  footer .footer-subfooter p {
     flex-direction: column;
     gap: 12px;
   }

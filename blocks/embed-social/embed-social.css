@@ -1,0 +1,99 @@
+/*
+ * Embed Social — "Social Media" section
+ * Two social feed columns side by side on desktop, stacked on mobile.
+ * Source: mpg.de white band, 1170px content, Bootstrap col-md-6 (50/50)
+ * with 15px inner gutters, Merriweather green heading (34px, weight 400).
+ */
+
+/* Source social band is white even though the EDS section is grey. */
+.embed-social.block {
+  background-color: #fff;
+  padding: 32px 0 49px;
+}
+
+/* Bootstrap-style row: negative gutter absorbed by column padding. */
+.embed-social .embed-social-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -15px;
+}
+
+/* Mobile: single column full width (col-xs-12). */
+.embed-social .embed-social-column {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 15px;
+}
+
+/* Section heading area (source .linked_title: margin 15px 0 45px). */
+.embed-social .embed-social-title {
+  min-height: 40.8px;
+  margin: 15px 0 45px;
+}
+
+.embed-social .embed-social-title h2 {
+  margin: 0;
+  font-family: var(--heading-font-family);
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 40.8px;
+  color: var(--brand-green);
+}
+
+/* Embed frame: placeholder card for the deferred social feed. */
+.embed-social .embed-social-frame {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #fafafa;
+  min-height: 320px;
+}
+
+.embed-social .embed-social-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 320px;
+  padding: 24px;
+  color: var(--brand-green);
+  text-align: center;
+}
+
+.embed-social .embed-social-cta:hover {
+  text-decoration: none;
+  background-color: #f2f2f2;
+}
+
+.embed-social .embed-social-frame-icon {
+  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--brand-green);
+}
+
+.embed-social .embed-social-frame-label {
+  font-family: var(--heading-font-family);
+  font-size: 20px;
+  color: var(--brand-green);
+}
+
+.embed-social .embed-social-frame-hint {
+  font-family: var(--body-font-family);
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+/* Desktop: two columns 50/50 (col-md-6), content capped at 1170px. */
+@media (width >= 900px) {
+  .embed-social .embed-social-grid {
+    max-width: 1170px;
+    margin: 0 auto;
+    padding: 0 15px;
+  }
+
+  .embed-social .embed-social-column {
+    width: 50%;
+  }
+}

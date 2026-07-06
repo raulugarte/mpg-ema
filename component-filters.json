@@ -34,7 +34,19 @@
     ]
   },
   {
-    "id": "cards-teaser",
+    "id": "cards-news",
+    "components": [
+      "card"
+    ]
+  },
+  {
+    "id": "cards-teasers",
+    "components": [
+      "card"
+    ]
+  },
+  {
+    "id": "cards-topic",
     "components": [
       "card"
     ]
@@ -58,7 +70,7 @@
     ]
   },
   {
-    "id": "columns-social",
+    "id": "columns-events",
     "components": [
       "column"
     ]

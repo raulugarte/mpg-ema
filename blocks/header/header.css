@@ -1,48 +1,45 @@
-/* MPG header — grey utility band + horizontal main nav with hover mega-dropdowns */
+/* stylelint-disable no-descending-specificity */
+
+/* MPG header — grey utility band (logo + language + search) + main nav row with
+   uppercase items, green dividers, and wide white dropdown panels.
+   Values extracted from https://www.mpg.de/en computed styles. */
 
 header .nav-wrapper {
   background-color: var(--grey-color, #eee);
   width: 100%;
-  z-index: 20;
-  position: relative;
 }
 
 header nav {
-  box-sizing: border-box;
-  display: grid;
-  grid-template-areas: 'brand hamburger' 'sections sections';
-  grid-template-columns: 1fr auto;
-  max-width: 1170px;
-  margin: 0 auto;
-  padding: 0 24px;
+  display: block;
   font-family: var(--body-font-family);
 }
 
-/* --- Brand / utility row --- */
+/* --- Brand / utility row (grey band) --- */
 header nav .nav-brand {
-  grid-area: brand;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding: 4px 0 8px;
+  gap: 24px;
+  background-color: #eee;
+  padding: 0 32px;
+  min-height: 172px;
 }
 
-header nav .nav-logo {
-  display: inline-block;
+header nav .nav-brand .nav-logo {
+  display: inline-flex;
+  align-items: center;
 }
 
-header nav .nav-logo img {
-  display: block;
+header nav .nav-brand .nav-logo img {
+  height: 140px;
   width: auto;
-  height: 90px;
+  display: block;
 }
 
 header nav .nav-tools {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
 }
 
 header nav .nav-lang {
@@ -55,18 +52,16 @@ header nav .nav-lang {
 }
 
 header nav .nav-lang:hover {
-  color: var(--brand-green, #006c66);
-  text-decoration: none;
+  color: var(--brand-green);
 }
 
-/* --- Search form: plain white box, teal outline magnifier on the right --- */
+/* --- Search --- */
 header nav .nav-search {
   display: flex;
-  align-items: stretch;
-  border: 0;
+  align-items: center;
+  border: 1px solid #ccc;
   background: #fff;
-  border-radius: 0;
-  overflow: hidden;
+  border-radius: 2px;
 }
 
 header nav .nav-search input[type="search"] {
@@ -80,38 +75,21 @@ header nav .nav-search input[type="search"] {
   color: #333;
 }
 
-header nav .nav-search input[type="search"]::placeholder {
-  color: #999;
-  opacity: 1;
-}
-
 header nav .nav-search-submit {
-  border: 0;
-  border-radius: 0;
-  margin: 0;
-  background: transparent;
-  color: var(--brand-green, #006c66);
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 14px;
-  flex: 0 0 auto;
-  align-self: stretch;
+  border: 0;
+  background: transparent;
+  color: var(--brand-green);
+  padding: 0 12px;
+  cursor: pointer;
 }
 
-header nav .nav-search-submit svg {
-  display: block;
-}
-
-header nav .nav-search-submit:hover {
-  background: var(--brand-dark-green, #055);
-}
-
-/* --- Main nav --- */
+/* --- Main navigation row (sits on the same grey band as the brand row) --- */
 header nav .nav-sections {
-  grid-area: sections;
-  padding-bottom: 16px;
+  background-color: #eee;
+  padding: 0 32px 20px;
 }
 
 header nav .nav-list {
@@ -120,55 +98,49 @@ header nav .nav-list {
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0;
 }
 
 header nav .nav-item {
-  position: static;
+  position: relative;
 }
 
-/* Top-level items: uppercase dark-slate labels (source: 18px/400, #263238),
-   green on hover, separated by green vertical divider bars (source: each link
-   has a 3px green border-right; the last item drops it). */
 header nav .nav-item > a {
   display: block;
   padding: 0 15px;
-  line-height: 22px;
   color: #263238;
   font-size: 18px;
-  font-weight: 400;
   text-transform: uppercase;
   text-decoration: none;
+  line-height: 1.6;
+  border-right: 3px solid var(--brand-green);
   cursor: pointer;
-  border-right: 3px solid var(--brand-green, #006c66);
 }
 
 header nav .nav-item:last-child > a {
-  border-right: 0;
+  border-right: none;
 }
 
-header nav .nav-item > a:hover,
-header nav .nav-item[aria-expanded="true"] > a {
-  color: var(--brand-green, #006c66);
+header nav .nav-item > a:hover {
+  color: var(--brand-green);
 }
 
-/* --- Mega-dropdown panel (desktop: 3-column white flyout under the nav bar,
-   centered to the 1170px container, matching the source mega-dropdown-menu) --- */
+/* --- Dropdown panels (wide white multi-column) --- */
 header nav .nav-panel {
   display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  min-width: 760px;
+  max-width: 90vw;
+  background: #fff;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 12%);
+  border-top: 3px solid var(--brand-green);
   list-style: none;
   margin: 0;
-  padding: 20px 10px;
-  position: absolute;
-  left: 0;
-  right: 0;
-  max-width: 1170px;
-  margin-inline: auto;
-  background: #fff;
-  box-shadow: 0 6px 12px rgb(0 0 0 / 18%);
-  z-index: 30;
-  column-gap: 0;
-  columns: 3;
+  padding: 24px 28px;
+  column-count: 3;
+  column-gap: 32px;
 }
 
 header nav .nav-item[aria-expanded="true"] > .nav-panel {
@@ -177,98 +149,84 @@ header nav .nav-item[aria-expanded="true"] > .nav-panel {
 
 header nav .nav-panel li {
   break-inside: avoid;
-  margin: 0;
+  margin: 0 0 8px;
 }
 
-/* stylelint-disable-next-line no-descending-specificity */
 header nav .nav-panel a {
-  display: block;
-  color: var(--brand-green, #006c66);
-  font-size: 16px;
-  line-height: 1.7;
-  padding: 6px 12px;
+  color: #263238;
   text-decoration: none;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 header nav .nav-panel a:hover {
+  color: var(--brand-green);
   text-decoration: underline;
-  color: var(--brand-dark-green, #055);
 }
 
 /* --- Hamburger (hidden on desktop) --- */
 header nav .nav-hamburger {
-  grid-area: hamburger;
   display: none;
-  align-self: center;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  padding: 8px;
 }
-
-header nav .nav-hamburger-icon,
-header nav .nav-hamburger-icon::before,
-header nav .nav-hamburger-icon::after {
-  display: block;
-  width: 24px;
-  height: 2px;
-  background: var(--brand-green, #006c66);
-  position: relative;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-header nav .nav-hamburger-icon::before,
-header nav .nav-hamburger-icon::after {
-  content: '';
-  position: absolute;
-  left: 0;
-}
-
-header nav .nav-hamburger-icon::before { top: -7px; }
-header nav .nav-hamburger-icon::after { top: 7px; }
 
 /* --- Mobile --- */
 @media (width <= 899px) {
-  header nav {
-    grid-template-areas: 'brand hamburger' 'sections sections';
-    grid-template-columns: 1fr auto;
+  header nav .nav-brand {
+    min-height: 64px;
     padding: 0 16px;
   }
 
-  header nav .nav-brand {
-    padding: 12px 0;
-  }
-
-  header nav .nav-logo img {
-    height: 40px;
+  header nav .nav-brand .nav-logo img {
+    height: 48px;
   }
 
   header nav .nav-tools {
-    display: none;
+    gap: 12px;
+  }
+
+  header nav .nav-search input[type="search"] {
+    width: 120px;
   }
 
   header nav .nav-hamburger {
-    display: block;
-  }
-
-  /* hamburger morph to cross when menu open */
-  header nav[aria-expanded="true"] .nav-hamburger-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    border: 0;
     background: transparent;
+    cursor: pointer;
+    z-index: 30;
   }
 
-  header nav[aria-expanded="true"] .nav-hamburger-icon::before {
-    top: 0;
-    transform: rotate(45deg);
+  header nav .nav-hamburger-icon,
+  header nav .nav-hamburger-icon::before,
+  header nav .nav-hamburger-icon::after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 26px;
+    height: 3px;
+    background: var(--brand-green);
+    transition: transform 0.3s ease, opacity 0.3s ease;
   }
 
-  header nav[aria-expanded="true"] .nav-hamburger-icon::after {
-    top: 0;
-    transform: rotate(-45deg);
-  }
+  header nav .nav-hamburger-icon::before { transform: translateY(-8px); }
+  header nav .nav-hamburger-icon::after { transform: translateY(8px); }
+
+  header nav[aria-expanded="true"] .nav-hamburger-icon { background: transparent; }
+
+  header nav[aria-expanded="true"] .nav-hamburger-icon::before { transform: rotate(45deg); }
+
+  header nav[aria-expanded="true"] .nav-hamburger-icon::after { transform: rotate(-45deg); }
 
   header nav .nav-sections {
     display: none;
-    width: 100%;
+    padding: 0;
   }
 
   header nav[aria-expanded="true"] .nav-sections {
@@ -277,26 +235,21 @@ header nav .nav-hamburger-icon::after { top: 7px; }
 
   header nav .nav-list {
     flex-direction: column;
-    width: 100%;
-    align-items: stretch;
-  }
-
-  header nav .nav-item {
-    width: 100%;
-    border-bottom: 1px solid #ddd;
   }
 
   header nav .nav-item > a {
-    width: 100%;
-    padding: 14px 0;
-    border-bottom: 0;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding: 12px 16px;
   }
 
-  /* mobile: panels are accordions (in-flow), single column */
   header nav .nav-panel {
     position: static;
+    min-width: 0;
+    max-width: none;
+    column-count: 1;
     box-shadow: none;
-    columns: 1;
-    padding: 0 0 12px 16px;
+    border-top: none;
+    padding: 0 16px 12px 28px;
   }
 }

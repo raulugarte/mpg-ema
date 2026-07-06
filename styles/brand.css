@@ -6,19 +6,21 @@
 
   /* colors */
   --background-color: #fff;
-  --text-color: #49494b;
+  --text-color: #000;
   --link-color: #006c66;
   --link-hover-color: #00201e;
+
+  /* brand palette */
   --brand-green: #006c66;
-  --brand-dark-green: #055;
-  --grey-color: #eee;
+  --brand-dark-green: #005550;
+  --section-grey: #eee;
+  --section-primary: #006c66;
 
   /* spacing */
-  --section-padding: 20px;
+  --section-padding: 40px;
   --content-max-width: 1170px;
-  --nav-height: 64px;
 
-  /* heading sizes (desktop) */
+  /* heading sizes (desktop, from source) */
   --heading-size-xxl: 30px;
   --heading-size-xl: 20px;
   --heading-size-l: 20px;

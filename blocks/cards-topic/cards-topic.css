@@ -1,0 +1,82 @@
+/* Block: cards-topic — mpg.de "Topic Specials"
+   White teaser cards on the brand-green (.section.primary) band.
+   Card = image (3:2, top) + green linked h3 + dark-grey description.
+   Values from source computed styles (see migration-work/cards-topic-extracted.css). */
+
+/* Card grid: 3 across on desktop, negative gutter -15px, cols pad 0 15px => 30px between */
+.cards-topic > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+}
+
+@media (width >= 900px) {
+  .cards-topic > ul {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Teaser card: white box, no border/shadow */
+.cards-topic > ul > li {
+  background-color: #fff;
+  border: 0;
+  box-shadow: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Image: fills card width at 3:2 ratio (source 360x240) */
+.cards-topic .cards-topic-card-image {
+  line-height: 0;
+}
+
+.cards-topic .cards-topic-card-image img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: 0;
+}
+
+/* Card body (text-box): padding 25px 25px 10px, transparent bg */
+.cards-topic .cards-topic-card-body {
+  background-color: transparent;
+  padding: 25px 25px 10px;
+  margin: 0;
+}
+
+/* Heading h3 — green Merriweather. Higher specificity than
+   `main .section.primary h3 { color:#fff }` in styles.css. */
+main .section.primary .cards-topic .cards-topic-card-body h3 {
+  margin: 0;
+  font-family: Merriweather, serif;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 30.8px;
+  color: #006c66;
+  text-transform: none;
+}
+
+/* Heading link — green, dotted underline. Beats `.section.primary a { color:#fff }`. */
+main .section.primary .cards-topic .cards-topic-card-body h3 a:any-link {
+  color: #006c66;
+  font-size: 22px;
+  font-weight: 400;
+  text-decoration: underline 1px dotted;
+}
+
+main .section.primary .cards-topic .cards-topic-card-body h3 a:hover {
+  color: #00201e;
+}
+
+/* Description — dark-grey Roboto on white card. Beats `.section.primary { color:#fff }`. */
+main .section.primary .cards-topic .cards-topic-card-body p {
+  margin: 0 0 25px;
+  font-family: Roboto, Tahoma, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 27.2px;
+  color: #494949;
+}

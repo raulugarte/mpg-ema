@@ -1,33 +1,25 @@
-/*
- * hero-teaser block
- * Full-bleed background image with a headline (H1 link) + "more" CTA
- * overlaid on a translucent white slanted panel at the bottom-left.
- * Values extracted from source computed styles (www.mpg.de/en).
- *
- * Decorated DOM:
- *   .hero-teaser
- *     > div (image row)  > div > p > picture > img
- *     > div (text row)   > div > h1 > a
- *                              > p.button-container > a.button ("more")
- */
+/* stylelint-disable no-descending-specificity */
 
-/* Let the hero break out of the section max-width (full-bleed). */
-.hero-teaser-container,
+/* Block: hero-teaser -- full-bleed hero with overlaid quote headline + CTA.
+   Values extracted from source computed styles (mpg.de teaser-hero). */
+
+/* Full-bleed: override the section max-width/padding wrapper */
+.hero-teaser-container .hero-teaser-wrapper,
 .hero-teaser-wrapper {
-  max-width: none;
+  max-width: 100% !important;
   margin: 0;
   padding: 0;
 }
 
 .hero-teaser.block {
   position: relative;
+  display: block;
+  min-height: 380px;
+  padding: 0;
   overflow: hidden;
-  min-height: 340px;
-  color: #000;
-  margin: 0;
 }
 
-/* --- Image row: full-bleed background, behind the content --- */
+/* Row 1 = background image, fills the block */
 .hero-teaser.block > div:first-child {
   position: absolute;
   inset: 0;
@@ -37,8 +29,8 @@
 
 .hero-teaser.block > div:first-child > div,
 .hero-teaser.block > div:first-child p {
-  margin: 0;
   height: 100%;
+  margin: 0;
 }
 
 .hero-teaser.block picture {
@@ -47,94 +39,89 @@
   height: 100%;
 }
 
-.hero-teaser.block img {
-  display: block;
+.hero-teaser.block picture img {
   width: 100%;
   height: 100%;
-  max-width: none;
   object-fit: cover;
-  object-position: 50% 50%;
+  object-position: center;
 }
 
-/* --- Text row: the translucent white slanted panel (bottom-left) --- */
-/* stylelint-disable-next-line no-descending-specificity */
-.hero-teaser.block > div:last-child {
+/* Row 2 = overlaid text, positioned bottom-left inside centered content column */
+.hero-teaser.block > div:nth-child(2) {
   position: relative;
   z-index: 1;
   display: flex;
-  align-items: flex-end;   /* push panel to the bottom */
-  min-height: 340px;
-  margin: 0;
-  padding: 0;
+  align-items: flex-end;
+  min-height: 380px;
+  max-width: 1170px;
+  margin: 0 auto;
+  padding: 0 24px 32px;
+  box-sizing: border-box;
 }
 
-.hero-teaser.block > div:last-child > div {
-  /* the panel itself: translucent white, angled right edge via clip-path */
-  position: relative;
-  width: 100%;
-  max-width: 375px;
-  margin: 0 0 24px;
+/* the text cell = the semi-transparent white headline box */
+.hero-teaser.block > div:nth-child(2) > div {
+  background-color: rgb(255 255 255 / 90%);
   padding: 24px 28px;
-  background-color: rgb(255 255 255 / 85%);
-  clip-path: polygon(0 0, 100% 0, calc(100% - 22px) 100%, 0 100%);
+  max-width: 520px;
+  box-sizing: border-box;
 }
 
 .hero-teaser.block h1 {
   margin: 0;
-  font-family: var(--heading-font-family);
-  font-size: 30px;
+  font-family: var(--heading-font-family, Merriweather, serif);
+  font-size: 28px;
   font-weight: 400;
-  line-height: 40.5px;
-  color: var(--brand-green);
+  line-height: 1.2;
+  color: var(--brand-green, #006c66);
 }
 
 .hero-teaser.block h1 a:any-link {
-  color: var(--brand-green);
-  text-decoration: none;
+  color: var(--brand-green, #006c66);
+  text-decoration: underline dotted 1px;
+  text-underline-offset: 4px;
 }
 
-.hero-teaser.block h1 a:hover {
-  color: var(--link-hover-color);
-  text-decoration: underline 1px dotted;
-}
-
-/* --- "more" CTA (EDS auto-decorated as a.button; reset to plain link) --- */
+/* "more" CTA -- reset EDS button decoration back to a plain green dotted link */
 .hero-teaser.block .button-container {
-  display: block;
-  margin: 8px 0 0;
+  margin: 10px 0 0;
+  text-align: left;
 }
 
 .hero-teaser.block a.button:any-link {
-  position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: baseline;
   margin: 0;
-  padding: 0 0 0 18px;
-  border: none;
+  border: 0;
   border-radius: 0;
+  padding: 0;
+  width: auto;
+  max-width: none;
+  overflow: visible;
+  white-space: normal;
   background: none;
-  color: var(--brand-green);
-  font-family: var(--body-font-family);
+  font-family: var(--heading-font-family, Merriweather, serif);
   font-size: 14px;
   font-weight: 300;
   line-height: 1.3;
-  text-decoration: underline 1px dotted;
-  white-space: normal;
+  color: var(--brand-green, #006c66);
+  text-transform: none;
+  text-decoration: underline dotted 1px;
+  text-underline-offset: 3px;
 }
 
-.hero-teaser.block a.button:hover {
-  color: var(--link-hover-color);
-  background: none;
-  text-decoration: underline 1px dotted;
-}
-
-/* chevron "›" preceding the "more" link (source uses an icon font) */
-.hero-teaser.block a.button::before {
-  content: "\203A"; /* › */
-  position: absolute;
-  left: 0;
-  top: 0;
-  font-weight: 400;
+.hero-teaser.block a.button:any-link::before {
+  content: "\276F"; /* ❯ chevron */
+  margin-right: 6px;
+  font-size: 11px;
   text-decoration: none;
+}
+
+.hero-teaser.block a.button:hover,
+.hero-teaser.block a.button:focus {
+  background: none;
+  color: var(--link-hover-color, #00201e);
+  text-decoration: underline dotted 1px;
 }
 
 @media (width >= 900px) {
@@ -142,14 +129,18 @@
     min-height: 600px;
   }
 
-  .hero-teaser.block > div:last-child {
+  .hero-teaser.block > div:nth-child(2) {
     min-height: 600px;
-    padding: 0 32px;
+    padding: 0 32px 100px;
   }
 
-  .hero-teaser.block > div:last-child > div {
-    max-width: 420px;
-    margin-bottom: 48px;
-    padding: 28px 32px;
+  .hero-teaser.block > div:nth-child(2) > div {
+    padding: 28px 29px;
+    max-width: 555px;
+  }
+
+  .hero-teaser.block h1 {
+    font-size: 34px;
+    line-height: 1.2;
   }
 }

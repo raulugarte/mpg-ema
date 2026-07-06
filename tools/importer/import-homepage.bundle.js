@@ -42,252 +42,484 @@ var CustomImportScript = (() => {
   });
 
   // tools/importer/parsers/hero-teaser.js
-  function parse(element, { document }) {
-    const image = element.querySelector('picture img, img.img-hero, img[class*="hero"], img');
-    const heading = element.querySelector('.headline h1, h1, h2, [class*="headline"] h1');
-    const ctaLink = element.querySelector('.more-link a, a.more, a[class*="more"]');
-    if (!image && !heading) {
+  function parse(element, { document: document2 }) {
+    const image = element.querySelector('picture img, img[class*="hero"], img');
+    const headline = element.querySelector(".headline h1, h1");
+    const teaserSpan = element.querySelector("a > span, .teaser-text, .description");
+    const teaserText = teaserSpan ? teaserSpan.textContent.trim() : "";
+    const cta = element.querySelector(".more-link a, a.more");
+    if (!image && !headline) {
       element.replaceWith(...element.childNodes);
       return;
     }
     const cells = [];
-    const imageCell = document.createDocumentFragment();
-    imageCell.appendChild(document.createComment(" field:image "));
-    if (image) imageCell.appendChild(image);
-    cells.push([imageCell]);
-    const textCell = document.createDocumentFragment();
-    textCell.appendChild(document.createComment(" field:text "));
-    if (heading) textCell.appendChild(heading);
-    if (ctaLink) {
-      const p = document.createElement("p");
-      p.appendChild(ctaLink);
+    if (image) {
+      const imageCell = document2.createDocumentFragment();
+      imageCell.appendChild(document2.createComment(" field:image "));
+      imageCell.appendChild(image);
+      cells.push([imageCell]);
+    } else {
+      cells.push([""]);
+    }
+    const textCell = document2.createDocumentFragment();
+    textCell.appendChild(document2.createComment(" field:text "));
+    if (headline) textCell.appendChild(headline);
+    if (teaserText) {
+      const p = document2.createElement("p");
+      p.textContent = teaserText;
+      textCell.appendChild(p);
+    }
+    if (cta) {
+      const p = document2.createElement("p");
+      p.appendChild(cta);
       textCell.appendChild(p);
     }
     cells.push([textCell]);
-    const block = WebImporter.Blocks.createBlock(document, { name: "hero-teaser", cells });
+    const block = WebImporter.Blocks.createBlock(document2, { name: "hero-teaser", cells });
     element.replaceWith(block);
   }
 
-  // tools/importer/parsers/cards-teaser.js
-  function parse2(element, { document }) {
-    let cardEls = Array.from(element.querySelectorAll(':scope .row > [class*="col-"]'));
-    if (cardEls.length === 0) {
-      cardEls = Array.from(element.querySelectorAll(".teaser"));
+  // tools/importer/parsers/cards-teasers.js
+  function parse2(element, { document: document2 }) {
+    let teasers = Array.from(element.querySelectorAll(".teaser"));
+    if (teasers.length === 0) {
+      teasers = Array.from(element.querySelectorAll('[class*="col-"] > .text-box, [class*="col-"] > div'));
     }
-    const cells = [];
-    cardEls.forEach((card) => {
-      const image = card.querySelector("picture img, img");
-      const textBox = card.querySelector(".text-box") || card.querySelector(".teaser") || card;
-      const heading = textBox.querySelector("h1, h2, h3, h4");
-      const bodyNodes = Array.from(textBox.querySelectorAll(":scope > p, :scope > .date, :scope > .tags, :scope > .more-link"));
-      if (!image && !heading && bodyNodes.length === 0) return;
-      let imageCell;
-      if (image) {
-        imageCell = document.createDocumentFragment();
-        imageCell.appendChild(document.createComment(" field:image "));
-        imageCell.appendChild(image);
-      } else {
-        imageCell = "";
-      }
-      const textCell = document.createDocumentFragment();
-      textCell.appendChild(document.createComment(" field:text "));
-      if (heading) textCell.appendChild(heading);
-      bodyNodes.forEach((n) => textCell.appendChild(n));
-      cells.push([imageCell, textCell]);
-    });
-    if (cells.length === 0) {
+    if (teasers.length === 0) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const block = WebImporter.Blocks.createBlock(document, { name: "cards-teaser", cells });
+    const cells = [];
+    teasers.forEach((teaser) => {
+      const box = teaser.querySelector(".text-box") || teaser;
+      const heading = box.querySelector("h2, h3, h4");
+      const paragraphs = Array.from(box.querySelectorAll("p"));
+      const image = teaser.querySelector("picture img, img");
+      const imageCell = document2.createDocumentFragment();
+      if (image) {
+        imageCell.appendChild(document2.createComment(" field:image "));
+        imageCell.appendChild(image);
+      }
+      const textCell = document2.createDocumentFragment();
+      textCell.appendChild(document2.createComment(" field:text "));
+      if (heading) textCell.appendChild(heading);
+      paragraphs.forEach((p) => textCell.appendChild(p));
+      cells.push([imageCell, textCell]);
+    });
+    const block = WebImporter.Blocks.createBlock(document2, { name: "cards-teasers", cells });
     element.replaceWith(block);
+  }
+
+  // tools/importer/parsers/cards-news.js
+  function parse3(element, { document: document2 }) {
+    const teasers = Array.from(element.querySelectorAll(".teaser"));
+    if (teasers.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const sectionTitleEl = element.querySelector(".linked_title h2, .linked_title h1, .linked_title h3");
+    let sectionHeading = null;
+    if (sectionTitleEl && sectionTitleEl.textContent.trim()) {
+      sectionHeading = document2.createElement("h2");
+      sectionHeading.textContent = sectionTitleEl.textContent.trim();
+    }
+    const ctaLink = element.querySelector(".text-center a.btn, .text-center a[href]");
+    let ctaPara = null;
+    if (ctaLink && ctaLink.getAttribute("href")) {
+      const a = document2.createElement("a");
+      a.setAttribute("href", ctaLink.getAttribute("href"));
+      a.textContent = ctaLink.textContent.trim();
+      ctaPara = document2.createElement("p");
+      ctaPara.appendChild(a);
+    }
+    const cells = [];
+    teasers.forEach((teaser) => {
+      const image = teaser.querySelector(".img-box img, picture img, img");
+      const textBox = teaser.querySelector(".text-box") || teaser;
+      const title = textBox.querySelector("h3, h2, h4");
+      const date = textBox.querySelector(".date, .data .attribute, .data");
+      const tags = textBox.querySelector(".tags");
+      const description = textBox.querySelector(".description");
+      const imageCell = document2.createDocumentFragment();
+      if (image) {
+        imageCell.appendChild(document2.createComment(" field:image "));
+        imageCell.appendChild(image);
+      }
+      const textCell = document2.createDocumentFragment();
+      textCell.appendChild(document2.createComment(" field:text "));
+      if (title) textCell.appendChild(title);
+      if (date) {
+        const p = document2.createElement("p");
+        p.textContent = date.textContent.trim();
+        textCell.appendChild(p);
+      }
+      if (tags) textCell.appendChild(tags);
+      if (description) {
+        const p = document2.createElement("p");
+        p.textContent = description.textContent.trim();
+        textCell.appendChild(p);
+      }
+      cells.push([imageCell, textCell]);
+    });
+    const block = WebImporter.Blocks.createBlock(document2, { name: "cards-news", cells });
+    const out = [];
+    if (sectionHeading) out.push(sectionHeading);
+    out.push(block);
+    if (ctaPara) out.push(ctaPara);
+    element.replaceWith(...out);
+  }
+
+  // tools/importer/parsers/cards-topic.js
+  function parse4(element, { document: document2 }) {
+    const teasers = Array.from(element.querySelectorAll(".teaser"));
+    if (teasers.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const sectionTitleEl = element.querySelector(".linked_title h2, .linked_title h1, .linked_title h3");
+    let sectionHeading = null;
+    if (sectionTitleEl && sectionTitleEl.textContent.trim()) {
+      sectionHeading = document2.createElement("h2");
+      sectionHeading.textContent = sectionTitleEl.textContent.trim();
+    }
+    const ctaLink = element.querySelector(".text-center a.btn, .text-center a[href]");
+    let ctaPara = null;
+    if (ctaLink && ctaLink.getAttribute("href")) {
+      const a = document2.createElement("a");
+      a.setAttribute("href", ctaLink.getAttribute("href"));
+      a.textContent = ctaLink.textContent.trim();
+      ctaPara = document2.createElement("p");
+      ctaPara.appendChild(a);
+    }
+    const cells = [];
+    teasers.forEach((teaser) => {
+      const image = teaser.querySelector(".img-box img, picture img, img");
+      const textBox = teaser.querySelector(".text-box") || teaser;
+      const title = textBox.querySelector("h3, h2, h4");
+      const description = textBox.querySelector(".description");
+      const imageCell = document2.createDocumentFragment();
+      if (image) {
+        imageCell.appendChild(document2.createComment(" field:image "));
+        imageCell.appendChild(image);
+      }
+      const textCell = document2.createDocumentFragment();
+      textCell.appendChild(document2.createComment(" field:text "));
+      if (title) textCell.appendChild(title);
+      if (description) {
+        const p = document2.createElement("p");
+        p.textContent = description.textContent.trim();
+        textCell.appendChild(p);
+      }
+      cells.push([imageCell, textCell]);
+    });
+    const block = WebImporter.Blocks.createBlock(document2, { name: "cards-topic", cells });
+    const out = [];
+    if (sectionHeading) out.push(sectionHeading);
+    out.push(block);
+    if (ctaPara) out.push(ctaPara);
+    element.replaceWith(...out);
   }
 
   // tools/importer/parsers/carousel-slider.js
-  function parse3(element, { document }) {
-    let slideEls = Array.from(element.querySelectorAll(
-      ":scope .pub-slider-item, :scope .box-color, :scope .teaser"
-    ));
-    if (slideEls.length === 0) {
-      slideEls = Array.from(element.querySelectorAll(':scope .slick-slide, :scope [class*="slider-item"]'));
+  function parse5(element, { document: document2 }) {
+    const sectionTitleEl = element.querySelector(":scope > .container > h2, :scope > .container > h1, :scope h2.h1, :scope h2.invert");
+    let sectionHeading = null;
+    if (sectionTitleEl && sectionTitleEl.textContent.trim()) {
+      sectionHeading = document2.createElement("h2");
+      sectionHeading.textContent = sectionTitleEl.textContent.trim();
     }
-    slideEls = slideEls.filter((el) => !el.closest(".slick-cloned"));
+    let slides = Array.from(element.querySelectorAll(".slick-slide:not(.slick-cloned)"));
+    if (slides.length === 0) {
+      slides = Array.from(element.querySelectorAll(".slick-slide"));
+    }
+    if (slides.length === 0) {
+      slides = Array.from(element.querySelectorAll(".pub-slider-item, .teaser, .box-color, .col-xs-12"));
+    }
+    if (slides.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
     const cells = [];
-    slideEls.forEach((slide) => {
+    slides.forEach((slide) => {
       const image = slide.querySelector("picture img, img");
-      const imageLink = image ? image.closest("a") : null;
-      let imageCell = "";
+      const boxHeader = slide.querySelector(".box-header");
+      const titleLink = slide.querySelector("a.h3, .text-box h3 a, h3 a, h2 a");
+      const date = slide.querySelector("time.date, .date");
+      const topic = slide.querySelector(".topic");
+      const description = slide.querySelector(".description");
+      const more = slide.querySelector("a.more");
+      const coverLink = slide.querySelector(".pub-slider-item > a, a > picture");
+      const imageCell = document2.createDocumentFragment();
       if (image) {
-        const frag = document.createDocumentFragment();
-        frag.appendChild(document.createComment(" field:media_image "));
-        frag.appendChild(imageLink || image);
-        imageCell = frag;
+        imageCell.appendChild(document2.createComment(" field:media_image "));
+        imageCell.appendChild(image);
       }
+      const textCell = document2.createDocumentFragment();
       const textParts = [];
-      const headingLink = slide.querySelector(":scope > a.h3, .text-box > a.h3");
-      const headingEl = slide.querySelector(".text-box h3, .meta-information h3, h1, h2, h3, h4, .headline");
-      if (headingEl && !headingEl.closest("a")) {
-        textParts.push(headingEl);
-      } else if (headingLink) {
-        const h = document.createElement("h3");
-        const a = document.createElement("a");
-        if (headingLink.getAttribute("href")) a.setAttribute("href", headingLink.getAttribute("href"));
-        a.textContent = headingLink.textContent.trim();
-        h.appendChild(a);
+      if (boxHeader) {
+        const p = document2.createElement("p");
+        p.textContent = boxHeader.textContent.trim();
+        textParts.push(p);
+      }
+      if (titleLink) {
+        const h = document2.createElement("h3");
+        h.appendChild(titleLink);
         textParts.push(h);
       }
-      const boxHeader = slide.querySelector(":scope > .box-header, .box-header");
-      if (boxHeader && boxHeader.textContent.trim()) {
-        const p = document.createElement("p");
-        p.textContent = boxHeader.textContent.trim();
-        textParts.unshift(p);
-      }
-      const dateEl = slide.querySelector("time.date, .data .date, .date");
-      if (dateEl && dateEl.textContent.trim()) {
-        const p = document.createElement("p");
-        p.textContent = dateEl.textContent.trim();
+      if (date) {
+        const p = document2.createElement("p");
+        p.textContent = date.textContent.trim();
         textParts.push(p);
       }
-      const topicEl = slide.querySelector(".meta-information .topic, .data .topic, .topic, .label");
-      if (topicEl && topicEl.textContent.trim()) {
-        const p = document.createElement("p");
-        p.textContent = topicEl.textContent.trim();
+      if (topic) {
+        const p = document2.createElement("p");
+        p.textContent = topic.textContent.trim();
         textParts.push(p);
       }
-      const tagLinks = Array.from(slide.querySelectorAll(".tags a"));
-      if (tagLinks.length > 0) {
-        const p = document.createElement("p");
-        tagLinks.forEach((a, i) => {
-          const span = document.createElement("a");
-          if (a.getAttribute("href")) span.setAttribute("href", a.getAttribute("href"));
-          span.textContent = a.textContent.trim();
-          if (i > 0) p.appendChild(document.createTextNode(", "));
-          p.appendChild(span);
-        });
+      if (description) {
+        const p = document2.createElement("p");
+        p.textContent = description.textContent.trim();
         textParts.push(p);
       }
-      const descEls = Array.from(slide.querySelectorAll(
-        ":scope .text-box > p, :scope > .description, :scope .text-box > .description"
-      ));
-      descEls.forEach((d) => {
-        if (!d.textContent.trim()) return;
-        const p = document.createElement("p");
-        p.textContent = d.textContent.trim();
-        textParts.push(p);
-      });
-      const moreLink = slide.querySelector("a.more, .more-link a");
-      if (moreLink && moreLink !== imageLink && moreLink.textContent.trim()) {
-        const p = document.createElement("p");
-        const a = document.createElement("a");
-        if (moreLink.getAttribute("href")) a.setAttribute("href", moreLink.getAttribute("href"));
-        a.textContent = moreLink.textContent.trim();
-        p.appendChild(a);
+      if (more) {
+        const p = document2.createElement("p");
+        p.appendChild(more);
         textParts.push(p);
       }
-      let textCell = "";
       if (textParts.length > 0) {
-        const frag = document.createDocumentFragment();
-        frag.appendChild(document.createComment(" field:content_text "));
-        textParts.forEach((n) => frag.appendChild(n));
-        textCell = frag;
+        textCell.appendChild(document2.createComment(" field:content_text "));
+        textParts.forEach((el) => textCell.appendChild(el));
       }
-      if (imageCell === "" && textCell === "") return;
       cells.push([imageCell, textCell]);
     });
-    if (cells.length === 0) {
-      element.replaceWith(...element.childNodes);
-      return;
-    }
-    const block = WebImporter.Blocks.createBlock(document, { name: "carousel-slider", cells });
-    element.replaceWith(block);
+    const block = WebImporter.Blocks.createBlock(document2, { name: "carousel-slider", cells });
+    const out = [];
+    if (sectionHeading) out.push(sectionHeading);
+    out.push(block);
+    element.replaceWith(...out);
   }
 
-  // tools/importer/parsers/columns-social.js
-  function parse4(element, { document }) {
-    let columnEls = Array.from(element.querySelectorAll(':scope .row > [class*="col-"]'));
-    if (columnEls.length === 0) {
-      columnEls = Array.from(element.querySelectorAll('[class*="col-md-"], [class*="col-sm-"]'));
-    }
-    if (columnEls.length === 0) {
+  // tools/importer/parsers/columns-events.js
+  function parse6(element, { document: document2 }) {
+    const columns = Array.from(element.querySelectorAll(':scope .row > [class*="col-"]'));
+    if (columns.length < 1) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const row = columnEls.map((col) => {
-      const cellContent = [];
-      const title = col.querySelector(".linked_title, h2, h3");
-      if (title && title.textContent.trim()) cellContent.push(title);
-      const deferred = col.querySelector(".deferred_extension[data-deffered-url], [data-deffered-url]");
-      if (deferred) cellContent.push(deferred);
-      if (cellContent.length === 0) {
-        Array.from(col.children).forEach((c) => cellContent.push(c));
+    const sectionTitleEl = element.querySelector(".linked_title h2, .linked_title h1, .linked_title h3");
+    let sectionHeading = null;
+    if (sectionTitleEl && sectionTitleEl.textContent.trim()) {
+      sectionHeading = document2.createElement("h2");
+      sectionHeading.textContent = sectionTitleEl.textContent.trim();
+    }
+    const leftSource = columns[0];
+    const rightSource = columns[1] || null;
+    const leftCell = document2.createElement("div");
+    const monthYear = leftSource ? leftSource.querySelector(".month_year") : null;
+    if (monthYear) {
+      const p = document2.createElement("p");
+      p.textContent = monthYear.textContent.replace(/\s+/g, " ").trim();
+      leftCell.appendChild(p);
+    }
+    const events = leftSource ? Array.from(leftSource.querySelectorAll(".single_event")) : [];
+    events.forEach((ev) => {
+      const titleLink = ev.querySelector("h5 a, a");
+      const time = ev.querySelector(".event_time");
+      if (titleLink) {
+        const h = document2.createElement("h5");
+        h.appendChild(titleLink);
+        leftCell.appendChild(h);
       }
-      return cellContent.length ? cellContent : "";
+      if (time) {
+        const p = document2.createElement("p");
+        p.textContent = time.textContent.trim();
+        leftCell.appendChild(p);
+      }
     });
-    const cells = [row];
-    const block = WebImporter.Blocks.createBlock(document, { name: "columns-social", cells });
+    const rightCell = document2.createElement("div");
+    if (rightSource) {
+      const tickerHead = rightSource.querySelector(".ticker_head, h2, h3");
+      if (tickerHead) {
+        const h = document2.createElement("h3");
+        h.textContent = tickerHead.textContent.trim();
+        rightCell.appendChild(h);
+      }
+      const tickerItems = Array.from(rightSource.querySelectorAll(".ticker_children a, .ticker_children .single_event"));
+      if (tickerItems.length > 0) {
+        tickerItems.forEach((item) => {
+          const p = document2.createElement("p");
+          p.appendChild(item.cloneNode(true));
+          rightCell.appendChild(p);
+        });
+      } else {
+        const empty = rightSource.querySelector(".nothing_found");
+        if (empty) {
+          const p = document2.createElement("p");
+          p.textContent = empty.textContent.trim();
+          rightCell.appendChild(p);
+        }
+      }
+    }
+    const cells = [[leftCell, rightCell]];
+    const block = WebImporter.Blocks.createBlock(document2, { name: "columns-events", cells });
+    const out = [];
+    if (sectionHeading) out.push(sectionHeading);
+    out.push(block);
+    element.replaceWith(...out);
+  }
+
+  // tools/importer/parsers/embed-social.js
+  function parse7(element, { document: document2 }) {
+    const deferred = Array.from(element.querySelectorAll(".deferred_extension[data-deffered-url]"));
+    const image = element.querySelector("picture img, img");
+    const uris = deferred.map((d) => d.getAttribute("data-deffered-url")).filter(Boolean).map((u) => {
+      try {
+        return new URL(u, "https://www.mpg.de/").href;
+      } catch (e) {
+        return u;
+      }
+    });
+    if (uris.length === 0 && !image) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const contentCell = document2.createDocumentFragment();
+    contentCell.appendChild(document2.createComment(" field:embed_placeholder "));
+    if (image) {
+      contentCell.appendChild(image);
+    }
+    contentCell.appendChild(document2.createComment(" field:embed_placeholderAlt "));
+    contentCell.appendChild(document2.createComment(" field:embed_uri "));
+    uris.forEach((uri) => {
+      const a = document2.createElement("a");
+      a.href = uri;
+      a.textContent = uri;
+      const p = document2.createElement("p");
+      p.appendChild(a);
+      contentCell.appendChild(p);
+    });
+    const cells = [[contentCell]];
+    const block = WebImporter.Blocks.createBlock(document2, { name: "embed-social", cells });
     element.replaceWith(block);
   }
 
-  // tools/importer/transformers/mpg-cleanup.js
+  // tools/importer/transformers/mpg-ema-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  function removeAll(element, selectors) {
+    const wi = typeof WebImporter !== "undefined" && WebImporter || typeof globalThis !== "undefined" && globalThis.WebImporter || null;
+    if (wi && wi.DOMUtils && typeof wi.DOMUtils.remove === "function") {
+      wi.DOMUtils.remove(element, selectors);
+      return;
+    }
+    selectors.forEach((selector) => {
+      element.querySelectorAll(selector).forEach((el) => el.remove());
+    });
+  }
   function transform(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
+      removeAll(element, [".slick-cloned"]);
     }
     if (hookName === TransformHook.afterTransform) {
-      WebImporter.DOMUtils.remove(element, [
+      removeAll(element, [
         "nav.skiplink",
-        "header.navbar.hero.navigation-on-bottom",
-        "header.container-full-width.visible-print-block",
-        "div.footer-wrap.noindex",
-        "footer.container-full-width.visible-print-block"
+        "header.navbar",
+        "header.visible-print-block",
+        "footer",
+        ".pwa-settings-panel",
+        "iframe",
+        "link",
+        "noscript",
+        "script",
+        "style"
       ]);
-      WebImporter.DOMUtils.remove(element, [
-        "div.content.py-0",
-        "aside.sidebar",
-        "div.social-media-buttons"
-      ]);
-      WebImporter.DOMUtils.remove(element, [
-        ".visible-print",
-        ".visible-print-block",
-        ".extension-image-zoom",
-        "#pwa-settings-panel",
-        "#go_to_live"
-      ]);
-      WebImporter.DOMUtils.remove(element, ["iframe", "noscript"]);
     }
   }
 
-  // tools/importer/transformers/mpg-sections.js
+  // tools/importer/transformers/mpg-ema-sections.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  var BAND_STYLE_MAP = {
+    "cards-news": { 0: "grey", 2: "grey" },
+    // News, Career (index 1 = International, white)
+    "cards-topic": { 0: "primary" },
+    // Topic Specials
+    "carousel-slider": { 1: "grey", 2: "grey" }
+    // From the Institutes, Multimedia (index 0 = Publications, white)
+  };
+  function getWebImporter() {
+    return typeof WebImporter !== "undefined" && WebImporter || typeof globalThis !== "undefined" && globalThis.WebImporter || null;
+  }
+  function norm(text) {
+    return (text || "").replace(/\s+/g, " ").trim().toLowerCase();
+  }
+  function computeBlockName(name) {
+    return name.replace(/-/g, " ").replace(/\s(.)/g, (s) => s.toUpperCase()).replace(/^(.)/g, (s) => s.toUpperCase());
+  }
+  var BLOCK_NAME_BY_HEADER = Object.keys(BAND_STYLE_MAP).reduce((acc, name) => {
+    acc[norm(computeBlockName(name))] = name;
+    return acc;
+  }, {});
+  function blockTableHeaderName(table) {
+    const firstRow = table.querySelector(":scope > tbody > tr, :scope > tr");
+    if (!firstRow) return "";
+    const th = firstRow.querySelector(":scope > th");
+    if (!th) return "";
+    return norm(th.textContent);
+  }
+  function resolveStyledBands(element) {
+    const doc = element.ownerDocument || document;
+    const root = element || doc.body;
+    const tables = Array.from(root.querySelectorAll("table"));
+    const perName = {};
+    const bands = [];
+    tables.forEach((table) => {
+      const header = blockTableHeaderName(table);
+      const blockName = BLOCK_NAME_BY_HEADER[header];
+      if (!blockName) return;
+      const idx = perName[blockName] || 0;
+      perName[blockName] = idx + 1;
+      const style = BAND_STYLE_MAP[blockName][idx];
+      if (style) bands.push({ el: table, style });
+    });
+    return bands;
+  }
+  function buildSectionMetadata(doc, style, wi) {
+    if (wi && wi.Blocks && typeof wi.Blocks.createBlock === "function") {
+      return wi.Blocks.createBlock(doc, { name: "Section Metadata", cells: { style } });
+    }
+    const table = doc.createElement("table");
+    const head = doc.createElement("tr");
+    const th = doc.createElement("th");
+    th.textContent = "Section Metadata";
+    head.appendChild(th);
+    table.appendChild(head);
+    const row = doc.createElement("tr");
+    const keyCell = doc.createElement("td");
+    keyCell.textContent = "style";
+    const valCell = doc.createElement("td");
+    valCell.textContent = style;
+    row.appendChild(keyCell);
+    row.appendChild(valCell);
+    table.appendChild(row);
+    return table;
+  }
   function transform2(hookName, element, payload) {
-    if (hookName !== TransformHook2.beforeTransform) return;
-    const sections = payload && payload.template && payload.template.sections;
-    if (!Array.isArray(sections) || sections.length < 2) return;
-    const doc = payload && payload.document || element && element.ownerDocument;
-    if (!doc) return;
-    for (let i = sections.length - 1; i >= 0; i -= 1) {
-      const section = sections[i];
-      if (!section || !section.selector) continue;
-      const sectionEl = element.querySelector(section.selector);
-      if (!sectionEl) continue;
-      if (section.style) {
-        const table = doc.createElement("table");
-        const headRow = doc.createElement("tr");
-        const headCell = doc.createElement("th");
-        headCell.setAttribute("colspan", "2");
-        headCell.textContent = "Section Metadata";
-        headRow.append(headCell);
-        const styleRow = doc.createElement("tr");
-        const keyCell = doc.createElement("td");
-        keyCell.textContent = "style";
-        const valCell = doc.createElement("td");
-        valCell.textContent = section.style;
-        styleRow.append(keyCell, valCell);
-        table.append(headRow, styleRow);
-        sectionEl.after(table);
+    if (hookName !== TransformHook2.afterTransform) return;
+    const wi = getWebImporter();
+    const doc = element.ownerDocument || document;
+    const bands = resolveStyledBands(element);
+    for (let i = bands.length - 1; i >= 0; i -= 1) {
+      const { style, el } = bands[i];
+      if (style) {
+        const meta = buildSectionMetadata(doc, style, wi);
+        if (el.nextSibling) {
+          el.parentNode.insertBefore(meta, el.nextSibling);
+        } else {
+          el.parentNode.appendChild(meta);
+        }
       }
-      if (i > 0) {
-        sectionEl.before(doc.createElement("hr"));
+      if (el.previousElementSibling) {
+        const hr = doc.createElement("hr");
+        el.parentNode.insertBefore(hr, el);
       }
     }
   }
@@ -295,57 +527,45 @@ var CustomImportScript = (() => {
   // tools/importer/import-homepage.js
   var parsers = {
     "hero-teaser": parse,
-    "cards-teaser": parse2,
-    "carousel-slider": parse3,
-    "columns-social": parse4
-  };
-  var PAGE_TEMPLATE = {
-    name: "homepage",
-    description: "Max Planck Society homepage: hero teaser, news/research highlight grids (cards), topic promo bands, image/video sliders, and social posts.",
-    urls: [
-      "https://www.mpg.de/en"
-    ],
-    sections: [
-      { id: "rc2", name: "hero", selector: "#page_content > main > div.container-full-width.background-block.teaser-hero" },
-      { id: "rc3", name: "text-teasers", selector: "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(2)" },
-      { id: "rc4", name: "news", selector: "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(3)", style: "grey" },
-      { id: "rc5", name: "international", selector: "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(4)" },
-      { id: "rc6", name: "career", selector: "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(5)", style: "grey" },
-      { id: "rc7", name: "topic-specials", selector: "#page_content > main > div.responsive_column.container-full-width.primary", style: "primary" },
-      { id: "rc8", name: "publications", selector: "#page_content > main > div.container-full-width.white:nth-of-type(7)" },
-      { id: "rc9", name: "from-the-institutes", selector: "#page_content > main > div.container-full-width.grey:nth-of-type(8)", style: "grey" },
-      { id: "rc10", name: "events", selector: "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(9)" },
-      { id: "rc11", name: "multimedia", selector: "#page_content > main > div.container-full-width.homepage_slider.grey", style: "grey" },
-      { id: "rc12", name: "social-media", selector: "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(11)" }
-    ],
-    blocks: [
-      { name: "hero-teaser", instances: ["#page_content > main > div.container-full-width.background-block.teaser-hero"] },
-      {
-        name: "cards-teaser",
-        instances: [
-          "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(2)",
-          "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(3)",
-          "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(4)",
-          "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(5)",
-          "#page_content > main > div.responsive_column.container-full-width.primary",
-          "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(9)"
-        ]
-      },
-      {
-        name: "carousel-slider",
-        instances: [
-          "#page_content > main > div.container-full-width.white:nth-of-type(7) div.slick-slider.row",
-          "#page_content > main > div.container-full-width.grey:nth-of-type(8) div.slick-slider.row",
-          "#page_content > main > div.container-full-width.homepage_slider.grey div.slick-slider.row.homepage-slider"
-        ]
-      },
-      { name: "columns-social", instances: ["#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(11)"] }
-    ]
+    "cards-teasers": parse2,
+    "cards-news": parse3,
+    "cards-topic": parse4,
+    "carousel-slider": parse5,
+    "columns-events": parse6,
+    "embed-social": parse7
   };
   var transformers = [
     transform,
-    ...PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [transform2] : []
+    transform2
   ];
+  var PAGE_TEMPLATE = {
+    name: "homepage",
+    description: "Max Planck Society homepage: header/nav, hero teaser, multiple teaser/card rows across white/grey/primary bands, publications and institute-news sliders, events, and a green/darkgreen footer.",
+    urls: ["https://www.mpg.de/en"],
+    blocks: [
+      { name: "hero-teaser", instances: ["#page_content > main > div.container-full-width.background-block.teaser-hero"] },
+      { name: "cards-teasers", instances: ["#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(2)"] },
+      {
+        name: "cards-news",
+        instances: [
+          "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(3)",
+          "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(4)",
+          "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(5)"
+        ]
+      },
+      { name: "cards-topic", instances: ["#page_content > main > div.responsive_column.container-full-width.primary"] },
+      {
+        name: "carousel-slider",
+        instances: [
+          "#page_content > main > div.container-full-width.white:nth-of-type(7)",
+          "#page_content > main > div.container-full-width.grey:nth-of-type(8)",
+          "#page_content > main > div.container-full-width.homepage_slider.grey"
+        ]
+      },
+      { name: "columns-events", instances: ["#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(9)"] },
+      { name: "embed-social", instances: ["#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(11)"] }
+    ]
+  };
   function executeTransformers(hookName, element, payload) {
     const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE });
     transformers.forEach((transformerFn) => {
@@ -356,21 +576,17 @@ var CustomImportScript = (() => {
       }
     });
   }
-  function findBlocksOnPage(document, template) {
+  function findBlocksOnPage(document2, template) {
     const pageBlocks = [];
     template.blocks.forEach((blockDef) => {
+      if (blockDef.name.startsWith("section-")) return;
       blockDef.instances.forEach((selector) => {
-        const elements = document.querySelectorAll(selector);
+        const elements = document2.querySelectorAll(selector);
         if (elements.length === 0) {
           console.warn(`Block "${blockDef.name}" selector not found: ${selector}`);
         }
         elements.forEach((element) => {
-          pageBlocks.push({
-            name: blockDef.name,
-            selector,
-            element,
-            section: blockDef.section || null
-          });
+          pageBlocks.push({ name: blockDef.name, selector, element });
         });
       });
     });
@@ -380,20 +596,20 @@ var CustomImportScript = (() => {
   var import_homepage_default = {
     transform: (payload) => {
       const {
-        document,
+        document: document2,
         url,
         html,
         params
       } = payload;
-      const main = document.body;
+      const main = document2.body;
       executeTransformers("beforeTransform", main, payload);
-      const pageBlocks = findBlocksOnPage(document, PAGE_TEMPLATE);
+      const pageBlocks = findBlocksOnPage(document2, PAGE_TEMPLATE);
       pageBlocks.forEach((block) => {
         if (!block.element.parentNode) return;
         const parser = parsers[block.name];
         if (parser) {
           try {
-            parser(block.element, { document, url, params });
+            parser(block.element, { document: document2, url, params });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
           }
@@ -402,10 +618,10 @@ var CustomImportScript = (() => {
         }
       });
       executeTransformers("afterTransform", main, payload);
-      const hr = document.createElement("hr");
+      const hr = document2.createElement("hr");
       main.appendChild(hr);
-      WebImporter.rules.createMetadata(main, document);
-      WebImporter.rules.transformBackgroundImages(main, document);
+      WebImporter.rules.createMetadata(main, document2);
+      WebImporter.rules.transformBackgroundImages(main, document2);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       const path = WebImporter.FileUtils.sanitizePath(
         new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html$/, "")
@@ -414,7 +630,7 @@ var CustomImportScript = (() => {
         element: main,
         path,
         report: {
-          title: document.title,
+          title: document2.title,
           template: PAGE_TEMPLATE.name,
           blocks: pageBlocks.map((b) => b.name)
         }
