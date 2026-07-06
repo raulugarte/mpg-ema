@@ -73,8 +73,9 @@ function handleViewportChange(nav, hamburger) {
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
-  // Fetch nav fragment: localhost/aem up first, then DA/EDS production path.
-  const navMeta = block.getAttribute('data-nav') || '/content/nav';
+  // Fetch nav fragment: local dev server first (repo content/ served at
+  // /content/nav.plain.html), then the published AEM site path.
+  const navMeta = block.getAttribute('data-nav') || '/content/mpg-ema/nav';
   let resp = await fetch('/content/nav.plain.html');
   if (!resp.ok) {
     resp = await fetch(`${navMeta}.plain.html`);

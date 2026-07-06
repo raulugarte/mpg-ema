@@ -3,7 +3,9 @@
  * @param {Element} block The footer block element
  */
 export default async function decorate(block) {
-  const footerPath = block.getAttribute('data-footer') || '/content/footer';
+  // Fetch footer fragment: local dev server first (repo content/ served at
+  // /content/footer.plain.html), then the published AEM site path.
+  const footerPath = block.getAttribute('data-footer') || '/content/mpg-ema/footer';
   let resp = await fetch('/content/footer.plain.html');
   if (!resp.ok) {
     resp = await fetch(`${footerPath}.plain.html`);
