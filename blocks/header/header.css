@@ -46,8 +46,8 @@ header nav .nav-tools {
 }
 
 header nav .nav-lang {
-  color: #333;
-  font-size: 15px;
+  color: #263238;
+  font-size: 14px;
   text-transform: uppercase;
   text-decoration: none;
   white-space: nowrap;
@@ -73,7 +73,7 @@ header nav .nav-search input[type="search"] {
   border: 0;
   outline: none;
   padding: 10px 14px;
-  font-size: 16px;
+  font-size: 14px;
   font-family: inherit;
   width: 220px;
   background: transparent;
