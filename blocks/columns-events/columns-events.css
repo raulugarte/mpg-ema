@@ -1,0 +1,89 @@
+/* stylelint-disable no-descending-specificity */
+
+/* columns-events -- Events section (calendar entry + upcoming events), two columns.
+   Values extracted from mpg.de/en computed styles. Mobile-first. */
+
+.columns-events {
+  color: var(--text-color);
+}
+
+/* Rows stack on mobile */
+.columns-events > div {
+  display: flex;
+  flex-direction: column;
+}
+
+/* "Upcoming Events" column heading (Merriweather, brand green, 22px) */
+.columns-events h3 {
+  font-family: var(--heading-font-family);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 30.8px;
+  color: var(--brand-green);
+  margin: 0;
+}
+
+/* Event title (calendar entry) -- rendered as h5 (Merriweather, green, 14px) */
+.columns-events h5 {
+  font-family: var(--heading-font-family);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.6px;
+  color: var(--brand-green);
+  margin: 15px 0 0;
+}
+
+/* Event title link inside the h5.
+   EDS may auto-decorate a standalone <p><a> into a green .button pill;
+   reset it back to a plain underlined green text link like the source. */
+.columns-events .button-container {
+  margin: 0;
+}
+
+.columns-events h5 a:any-link,
+.columns-events a:any-link,
+main .columns-events a.button:any-link {
+  display: inline;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
+  font-family: var(--heading-font-family);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.6px;
+  color: var(--link-color);
+  text-decoration: underline;
+  text-transform: none;
+}
+
+.columns-events a:hover,
+.columns-events a:focus,
+main .columns-events a.button:hover,
+main .columns-events a.button:focus {
+  background-color: transparent;
+  color: var(--link-hover-color);
+}
+
+/* Caption ("July 2026"), date/time, and "No events" paragraphs (Roboto, slate) */
+.columns-events p {
+  font-family: var(--body-font-family);
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 27.2px;
+  color: rgb(69 90 100);
+  margin: 0;
+}
+
+/* Two side-by-side columns on desktop (calendar/events left, Upcoming Events right) */
+@media (width >= 900px) {
+  .columns-events > div {
+    flex-direction: row;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .columns-events > div > div {
+    flex: 1 1 0%;
+  }
+}

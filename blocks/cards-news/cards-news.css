@@ -1,0 +1,121 @@
+/* cards-news -- article teaser cards (mpg.de News/International/Career bands) */
+
+/* Values extracted from source computed styles. Works on white and grey bands. */
+
+.cards-news > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+}
+
+@media (width >= 900px) {
+  .cards-news > ul {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 30px;
+  }
+}
+
+.cards-news > ul > li {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  margin-bottom: 17px;
+}
+
+/* image: full-width across the top of the card, ~3:2 aspect (360x240 source) */
+.cards-news .cards-news-card-image {
+  line-height: 0;
+}
+
+.cards-news .cards-news-card-image p {
+  margin: 0;
+}
+
+.cards-news > ul > li img {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  display: block;
+}
+
+/* text box: 25px sides/top, 10px bottom */
+.cards-news .cards-news-card-body {
+  padding: 25px 25px 10px;
+}
+
+/* title */
+.cards-news .cards-news-card-body h3 {
+  margin: 0 0 4px;
+  font-family: var(--heading-font-family);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.4;
+  color: var(--brand-green);
+}
+
+.cards-news .cards-news-card-body h3 a:any-link {
+  color: inherit;
+
+  /* source card titles use a dotted green underline (matches tag links) */
+  text-decoration: underline dotted 1px;
+  text-underline-offset: 2px;
+}
+
+.cards-news .cards-news-card-body h3 a:hover,
+.cards-news .cards-news-card-body h3 a:focus {
+  color: var(--link-hover-color);
+  text-decoration: underline dotted 1px;
+}
+
+/* date */
+.cards-news .cards-news-card-body p.cards-news-date {
+  margin: 0;
+  font-family: var(--body-font-family);
+  font-weight: 900;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #49494b;
+  text-transform: uppercase;
+}
+
+/* category tags */
+.cards-news .cards-news-card-body p.cards-news-tags {
+  margin: 0;
+  font-size: 0;
+}
+
+/* Reset any EDS auto-button decoration so tags stay inline text links. */
+.cards-news .cards-news-card-body p.cards-news-tags a:any-link,
+.cards-news .cards-news-card-body p.cards-news-tags a.button:any-link {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font-family: var(--body-font-family);
+  font-weight: 300;
+  font-size: 12.8px;
+  line-height: 1.7;
+  color: var(--brand-green);
+  text-decoration: underline dotted 1px;
+  white-space: normal;
+}
+
+.cards-news .cards-news-card-body p.cards-news-tags a:not(:last-child)::after {
+  content: ", ";
+  text-decoration: none;
+}
+
+/* excerpt */
+.cards-news .cards-news-card-body p.cards-news-excerpt {
+  margin: 0 0 25px;
+  font-family: var(--body-font-family);
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #000;
+}

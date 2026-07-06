@@ -1,46 +1,61 @@
 /* eslint-disable */
 /* global WebImporter */
 /**
- * Parser for hero-teaser. Base block: hero.
- * Source: https://www.mpg.de/en (Max Planck Society homepage).
- * Generated for xwalk project (field-hinted output).
- *
+ * Parser for hero-teaser. Base: hero. Source: https://www.mpg.de/en
  * xwalk model (blocks/hero-teaser/_hero-teaser.json):
- *   - image (reference)      -> row 1 (field:image)
- *   - imageAlt (collapsed)   -> becomes <img alt> attribute, no own row/hint
- *   - text (richtext)        -> row 2 (field:text) — headline link + "more" CTA
- *
- * Source variations handled:
- *   - Background image lives inside a trailing full-bleed anchor (picture > img).
- *   - Headline is an <h1><a>...</a></h1>; a separate ".more-link a.more" CTA may exist.
+ *   image (reference) + imageAlt (collapsed -> img alt), text (richtext)
+ * Table: 1 column.
+ *   Row 1 (cell): image                        -> <!-- field:image -->
+ *   Row 2 (cell): headline + teaser copy + CTA -> <!-- field:text -->
+ * Note: image and text live in SEPARATE cells so the richtext field does not
+ * greedily consume past the <img> (md2jcr richtext-after-image gotcha avoided).
+ * Teaser paragraph: the source keeps its intro/teaser copy in a display:none span
+ * inside the trailing image anchor (SEO/accessibility duplicate). It is meaningful
+ * editorial copy and the hero-teaser model's text field is its intended slot, so it
+ * is restored as a paragraph after the headline.
  */
 export default function parse(element, { document }) {
-  // INPUT EXTRACTION — selectors validated against source.html
-  const image = element.querySelector('picture img, img.img-hero, img[class*="hero"], img');
-  const heading = element.querySelector('.headline h1, h1, h2, [class*="headline"] h1');
-  const ctaLink = element.querySelector('.more-link a, a.more, a[class*="more"]');
+  // Background/hero image (inside the full-bleed anchor wrapper)
+  const image = element.querySelector('picture img, img[class*="hero"], img');
 
-  // Empty-block guard: bail if no headline and no image
-  if (!image && !heading) {
+  // Headline (h1) with its linked title
+  const headline = element.querySelector('.headline h1, h1');
+  // Teaser/intro copy (source stores it in a display:none span in the image anchor)
+  const teaserSpan = element.querySelector('a > span, .teaser-text, .description');
+  const teaserText = teaserSpan ? teaserSpan.textContent.trim() : '';
+  // CTA "more" link
+  const cta = element.querySelector('.more-link a, a.more');
+
+  // Empty-block guard
+  if (!image && !headline) {
     element.replaceWith(...element.childNodes);
     return;
   }
 
   const cells = [];
 
-  // Row 1: image (field:image). imageAlt is collapsed into the <img alt> attribute.
-  const imageCell = document.createDocumentFragment();
-  imageCell.appendChild(document.createComment(' field:image '));
-  if (image) imageCell.appendChild(image);
-  cells.push([imageCell]);
+  // Row: image field
+  if (image) {
+    const imageCell = document.createDocumentFragment();
+    imageCell.appendChild(document.createComment(' field:image '));
+    imageCell.appendChild(image);
+    cells.push([imageCell]);
+  } else {
+    cells.push(['']);
+  }
 
-  // Row 2: text (field:text) — richtext holding the headline (with link) and CTA.
+  // Row: text (richtext) field — headline heading + CTA
   const textCell = document.createDocumentFragment();
   textCell.appendChild(document.createComment(' field:text '));
-  if (heading) textCell.appendChild(heading);
-  if (ctaLink) {
+  if (headline) textCell.appendChild(headline);
+  if (teaserText) {
     const p = document.createElement('p');
-    p.appendChild(ctaLink);
+    p.textContent = teaserText;
+    textCell.appendChild(p);
+  }
+  if (cta) {
+    const p = document.createElement('p');
+    p.appendChild(cta);
     textCell.appendChild(p);
   }
   cells.push([textCell]);

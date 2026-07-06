@@ -7,11 +7,13 @@ import { getMetadata } from '../../scripts/aem.js';
 export default async function decorate(block) {
   // Footer fragment path is metadata-driven (single source of truth): the page's
   // `<meta name="footer">` if present, otherwise the site-root default `/footer`.
-  // Resolved to a pathname so it is portable across author, delivery and local
-  // proxy — no hardcoded /content path and no guaranteed-404 first request.
+  // Dual-fetch: localhost/aem up first, then DA/EDS production path.
   const footerMeta = getMetadata('footer');
   const footerPath = footerMeta ? new URL(footerMeta, window.location).pathname : '/footer';
-  const resp = await fetch(`${footerPath}.plain.html`);
+  let resp = await fetch('/content/footer.plain.html');
+  if (!resp.ok) {
+    resp = await fetch(`${footerPath}.plain.html`);
+  }
   if (!resp.ok) return;
 
   const html = await resp.text();

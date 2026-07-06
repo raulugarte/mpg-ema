@@ -1,32 +1,32 @@
 {
-  "variantName": "hero-teaser",
-  "baseBlock": "hero",
+  "variantName": "embed-social",
+  "baseBlock": "embed",
   "version": "1.0.0",
   "created": "2026-07-06T00:00:00.000Z",
   "sourceContext": {
     "originUrl": "https://www.mpg.de/en",
     "originPage": "Max Planck Society homepage",
-    "blockPosition": "top"
+    "blockPosition": "bottom"
   },
   "visualCharacteristics": {
-    "colorScheme": "dark",
-    "density": "spacious",
-    "purpose": "hero",
+    "colorScheme": "light",
+    "density": "compact",
+    "purpose": "social-feed",
     "imagePattern": "large"
   },
   "contentPattern": {
-    "structure": "background image + headline/quote + CTA",
-    "buttonCount": 1,
+    "structure": "optional placeholder image + social post URI",
+    "buttonCount": 0,
     "imageCount": 1
   },
   "reuseGuidance": {
     "suitableFor": [
-      "homepage hero banners with a full-bleed background image",
-      "campaign landing pages with an overlaid quote/headline"
+      "embedded social media posts/feeds (Twitter/X, etc.)",
+      "'Social Media' homepage sections"
     ],
     "notSuitableFor": [
-      "text-only intros without a background image",
-      "pages needing multiple content rows below the banner"
+      "standalone video embeds (use a video/embed-video variant)",
+      "static image content"
     ]
   },
   "usage": {

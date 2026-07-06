@@ -1,6 +1,6 @@
 {
-  "variantName": "carousel-slider",
-  "baseBlock": "carousel",
+  "variantName": "cards-news",
+  "baseBlock": "cards",
   "version": "1.0.0",
   "created": "2026-07-06T00:00:00.000Z",
   "sourceContext": {
@@ -11,30 +11,28 @@
   "visualCharacteristics": {
     "colorScheme": "light",
     "density": "compact",
-    "purpose": "slider",
+    "purpose": "news",
     "imagePattern": "large"
   },
   "contentPattern": {
-    "structure": "rotating slides: image/thumbnail + optional linked title",
+    "structure": "article teaser cards: image + linked title + excerpt",
     "buttonCount": 0,
     "imageCount": 1
   },
   "reuseGuidance": {
     "suitableFor": [
-      "publication cover sliders",
-      "institute news sliders",
-      "multimedia/video teaser sliders",
-      "any horizontally-rotating teaser gallery"
+      "news/article teaser rows with image + title + excerpt",
+      "International, Career and similar article-teaser sections"
     ],
     "notSuitableFor": [
-      "static (non-rotating) card grids",
-      "single hero banners"
+      "text-only teaser rows without images",
+      "brand-colored/inverted card sections"
     ]
   },
   "usage": {
     "pagesUsing": ["/en"],
     "reuseCount": 3,
     "lastUsed": "2026-07-06T00:00:00.000Z",
-    "reusedInSections": ["publications", "from-the-institutes", "multimedia"]
+    "reusedInSections": ["news", "international", "career"]
   }
 }

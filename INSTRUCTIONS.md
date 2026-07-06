@@ -29,6 +29,18 @@ const resp = await fetch(`${path}.plain.html`);
 if (!resp.ok) return;
 ```
 
+## Shared page head (`head.html`)
+
+- `head.html` is injected into **every page in every environment** (author, delivery,
+  preview, and local `aem up`). Never put an **absolute, environment-specific** fragment
+  path in it (e.g. `<meta name="nav" content="/content/nav">`). A `/content/`-prefixed
+  value only resolves on the local proxy and ships a broken (loaded-but-empty)
+  header/footer to delivery.
+- Leave nav/footer metadata **out** of the shared head. The block code already falls back
+  to the safe site-root defaults (`/nav`, `/footer`), which are the delivery paths.
+- If a specific page needs a non-default fragment, author `meta[name="nav"]` /
+  `meta[name="footer"]` **per page** or via the metadata sheet — not in the shared head.
+
 ## Metadata-driven behavior
 
 - When XWalk expects metadata-driven values, read them from the page head via

@@ -1,51 +1,24 @@
-/* ==========================================================================
-   Max Planck Society — carousel-slider
-   Two variants share one block name:
-   - Publications: filmstrip of cover images (image cell + empty content cell)
-   - Multimedia:   poster cards (image cell + text content cell)
-   Values extracted from https://www.mpg.de/en computed styles.
-   ========================================================================== */
+/* stylelint-disable no-descending-specificity */
 
-/* The block IS a full-width band. Break out of the section max-width and
-   paint the band background across the viewport.  Source band padding
-   is 32px top / 49px bottom. */
-.carousel-slider-wrapper {
-  max-width: 100% !important;
-  padding: 0 !important;
-}
+/* Block: carousel-slider
+ * Values extracted from https://www.mpg.de/en slick sliders.
+ * Three usages share the same block, distinguished by cell content:
+ *   Publications  = image cell only (portrait covers)
+ *   Institutes    = content cell only (dark teaser boxes)
+ *   Multimedia    = image + content (landscape thumb + text)
+ * Rendered as a fixed-width horizontal strip (multi-item), matching mpg.de,
+ * using scroll-snap so the existing prev/next arrows and dots still work.
+ */
 
 .carousel-slider {
-  padding: 32px 0 49px;
-  background-color: var(--background-color); /* white — Publications default */
+  position: relative;
 }
 
-/* Grey band variant (Multimedia / From the Institutes) */
-.carousel-slider.grey,
-.section.grey .carousel-slider {
-  background-color: var(--grey-color); /* #eee */
-}
-
-/* Section heading (h2) rendered as default content just above the block —
-   Merriweather 34px, green, matching source. Handled by section styling,
-   but ensure the block's own inner heading (if any) matches. */
-.carousel-slider h2 {
-  max-width: var(--content-max-width, 1170px);
-  margin: 15px auto 8px;
-  padding: 0 55px;
-  font-family: var(--heading-font-family);
-  font-size: 34px;
-  font-weight: 400;
-  line-height: 1.2;
-  color: var(--brand-green);
-}
-
-/* Centered content rail with room on the sides for the arrows (source uses
-   .container margin 0 55px inside a 1170 max-width). */
 .carousel-slider .carousel-slider-slides-container {
   position: relative;
-  max-width: var(--content-max-width, 1170px);
-  margin: 0 auto;
-  padding: 0 55px;
+
+  /* room for the edge arrows (source arrows sit ~25px outside track) */
+  padding: 0 30px;
 }
 
 .carousel-slider .carousel-slider-slides,
@@ -55,180 +28,263 @@
   padding: 0;
 }
 
-/* Horizontal filmstrip: slides sit side by side and scroll/snap on the x-axis. */
 .carousel-slider .carousel-slider-slides {
   display: flex;
+  flex-wrap: nowrap;
   gap: 0;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
-  overflow: scroll clip;
+  overflow: auto hidden;
 }
 
 .carousel-slider .carousel-slider-slides::-webkit-scrollbar {
   display: none;
 }
 
-/* Each slide is auto-height and a fixed narrow width so several show at once.
-   Default (Multimedia poster card): 367px slide, 337px image + 15px gutters. */
+/* base slide: fixed-width strip item (not full-width hero) */
 .carousel-slider .carousel-slider-slide {
-  box-sizing: border-box;
   flex: 0 0 auto;
-  width: 367px;
   scroll-snap-align: start;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
   position: relative;
+  box-sizing: border-box;
   min-height: 0;
-  padding: 0 15px;
+  width: 275px;              /* default (institutes) */
+  padding: 0 15px;           /* 15px gutter each side (source item padding) */
 }
 
-/* --- Image cell (both variants) --- */
-.carousel-slider .carousel-slider-slide-image {
-  position: relative;
+/* ---- image cell (covers / thumbnails) ---- */
+.carousel-slider .carousel-slider-slide .carousel-slider-slide-image {
   margin: 0;
 }
 
-.carousel-slider .carousel-slider-slide-image p {
-  margin: 0;
-}
-
-.carousel-slider .carousel-slider-slide-image picture,
-.carousel-slider .carousel-slider-slide-image a {
+.carousel-slider .carousel-slider-slide .carousel-slider-slide-image picture {
   display: block;
 }
 
-.carousel-slider .carousel-slider-slide-image img {
+.carousel-slider .carousel-slider-slide .carousel-slider-slide-image img {
   display: block;
   width: 100%;
   height: auto;
   object-fit: cover;
 }
 
-/* --- Content cell (Multimedia) --- */
-.carousel-slider .carousel-slider-slide-content {
-  padding: 20px 0 10px;
-  color: var(--text-color);
-  font-size: var(--body-font-size-m);
-  line-height: 1.5;
+/* EDS wraps bare <img> in <p>; kill that spacing */
+.carousel-slider .carousel-slider-slide .carousel-slider-slide-image p {
+  margin: 0;
 }
 
-.carousel-slider .carousel-slider-slide-content h3,
-.carousel-slider .carousel-slider-slide-content h4 {
-  margin: 0 0 4px;
-  font-family: var(--heading-font-family);
-  font-size: var(--heading-font-size-l); /* 20px */
-  font-weight: 400;
-  line-height: 1.3;
-  color: var(--brand-green);
+/* =====================================================================
+   Usage 1: Publications — image cell only, 154px-wide portrait covers
+            (each cover keeps its own natural height, ~195-228px)
+   ===================================================================== */
+.carousel-slider .carousel-slider-slide:has(.carousel-slider-slide-image picture):not(:has(.carousel-slider-slide-content h3)) {
+  width: 184px;              /* 154 cover + 15px each side */
+  align-items: center;
+  justify-content: center;
 }
 
-.carousel-slider .carousel-slider-slide-content h3 a,
-.carousel-slider .carousel-slider-slide-content h4 a {
-  color: var(--brand-green);
-}
-
-.carousel-slider .carousel-slider-slide-content p {
-  margin: 4px 0 0;
-}
-
-/* =====================  PUBLICATIONS variant  ============================
-   Slides where the content cell is empty are cover-image slides: narrower
-   width (184px slide, 154px image), no card body. */
-.carousel-slider .carousel-slider-slide:has(.carousel-slider-slide-content:empty) {
-  width: 184px;
-}
-
-.carousel-slider .carousel-slider-slide:has(.carousel-slider-slide-content:empty) .carousel-slider-slide-image img {
+.carousel-slider .carousel-slider-slide:has(.carousel-slider-slide-image picture):not(:has(.carousel-slider-slide-content h3)) .carousel-slider-slide-image img {
+  /* Source: fixed 154px width, auto height — each cover keeps its own
+     natural portrait aspect ratio (heights ~195-228px). No forced box,
+     no cropping/letterboxing (source object-fit: fill on natural-size img). */
   width: 154px;
-  margin: 0 auto;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: fill;
 }
 
-.carousel-slider .carousel-slider-slide .carousel-slider-slide-content:empty {
+/* hide the empty content cell in publications */
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-content h3)) .carousel-slider-slide-content:empty {
   display: none;
 }
 
-/* ==========================  Navigation arrows  ==========================
-   Source arrows are large green (opacity .75) chevrons sitting just outside
-   the rail (left/right ~ -25px from the .container). */
+/* =====================================================================
+   Usage 2: From the Institutes — content cell only, dark teaser box
+   ===================================================================== */
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)):has(.carousel-slider-slide-content) {
+  width: 275px;
+}
+
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)) .carousel-slider-slide-image:empty {
+  display: none;
+}
+
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)) .carousel-slider-slide-content {
+  box-sizing: border-box;
+  min-height: 250px;
+  padding: 10px 15px;
+  background-color: #263238;   /* source box-color bg-grey */
+  color: #fff;
+}
+
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)) .carousel-slider-slide-content p {
+  margin: 4px 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #fff;
+}
+
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)) .carousel-slider-slide-content h3 {
+  margin: 6px 0;
+  font-size: 16px;
+  line-height: 1.3;
+  color: #fff;
+}
+
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)) .carousel-slider-slide-content a:any-link {
+  color: #fff;
+}
+
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)) .carousel-slider-slide-content a:hover {
+  text-decoration: underline;
+}
+
+/* EDS auto-decorates the standalone "more" link as a green pill button;
+   source renders it as a plain white text link inside the dark box */
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)) .carousel-slider-slide-content .button-container {
+  margin: 6px 0 0;
+}
+
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)) .carousel-slider-slide-content a.button:any-link {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)) .carousel-slider-slide-content a.button:hover,
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)) .carousel-slider-slide-content a.button:focus {
+  background: transparent;
+  text-decoration: underline;
+}
+
+/* =====================================================================
+   Usage 3: Multimedia — image + content, landscape thumb 337x225 + text
+   ===================================================================== */
+.carousel-slider .carousel-slider-slide:has(.carousel-slider-slide-image picture):has(.carousel-slider-slide-content h3) {
+  width: 367px;              /* 337 img + 15px each side */
+  align-items: stretch;
+}
+
+.carousel-slider .carousel-slider-slide:has(.carousel-slider-slide-image picture):has(.carousel-slider-slide-content h3) .carousel-slider-slide-image img {
+  width: 100%;
+  aspect-ratio: 337 / 225;   /* ~3:2 landscape */
+  object-fit: cover;
+}
+
+.carousel-slider .carousel-slider-slide:has(.carousel-slider-slide-image picture):has(.carousel-slider-slide-content h3) .carousel-slider-slide-content {
+  padding: 0;
+  color: var(--text-color);
+}
+
+.carousel-slider .carousel-slider-slide:has(.carousel-slider-slide-image picture):has(.carousel-slider-slide-content h3) .carousel-slider-slide-content h3 {
+  margin: 10px 0 4px;
+  font-family: var(--heading-font-family);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.4;          /* 30.8px / 22px */
+  color: var(--brand-green);
+}
+
+.carousel-slider .carousel-slider-slide:has(.carousel-slider-slide-image picture):has(.carousel-slider-slide-content h3) .carousel-slider-slide-content p {
+  margin: 4px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-color);
+}
+
+/* =====================================================================
+   Navigation arrows — brand-green chevrons at the strip edges
+   ===================================================================== */
 .carousel-slider .carousel-slider-navigation-buttons {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  left: 0;
-  right: 0;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  pointer-events: none;
   z-index: 2;
+  pointer-events: none;
 }
 
 .carousel-slider .carousel-slider-navigation-buttons button {
   position: relative;
-  width: 44px;
-  height: 44px;
+  width: 30px;
+  height: 60px;
   margin: 0;
   padding: 0;
-  border: none;
+  border: 0;
   border-radius: 0;
-  background: none;
-  pointer-events: auto;
+  background: transparent;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .carousel-slider .carousel-slider-navigation-buttons button:hover,
-.carousel-slider .carousel-slider-navigation-buttons button:focus,
 .carousel-slider .carousel-slider-navigation-buttons button:focus-visible {
-  background: none;
+  background: transparent;
 }
 
-/* Chevron glyphs drawn with borders, green at 75% opacity like the source. */
 .carousel-slider .carousel-slider-navigation-buttons button::after {
   display: block;
   content: '';
+  width: 16px;
+  height: 16px;
+  border: 3px solid var(--brand-green);
+  border-bottom: 0;
+  border-left: 0;
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 22px;
-  height: 22px;
-  border: 4px solid var(--brand-green);
-  border-bottom: 0;
-  border-left: 0;
-  opacity: 0.75;
 }
 
 .carousel-slider .carousel-slider-navigation-buttons button.slide-prev::after {
-  transform: translate(-30%, -50%) rotate(-135deg);
+  transform: translate(-40%, -50%) rotate(-135deg);
 }
 
 .carousel-slider .carousel-slider-navigation-buttons button.slide-next::after {
-  transform: translate(-70%, -50%) rotate(45deg);
+  transform: translate(-60%, -50%) rotate(45deg);
 }
 
 .carousel-slider .carousel-slider-navigation-buttons button:hover::after,
 .carousel-slider .carousel-slider-navigation-buttons button:focus-visible::after {
-  opacity: 1;
+  border-color: var(--link-hover-color);
 }
 
-/* Hide the default dot indicators — source uses only arrows on these sliders. */
+/* =====================================================================
+   Slide dot indicators — brand-green, centered below
+   ===================================================================== */
 .carousel-slider .carousel-slider-slide-indicators {
-  display: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 0 0;
+  background: transparent;
+  line-height: 0;
 }
 
-/* ==============================  Mobile  =================================
-   On narrow screens the slides simply become swipeable at reduced width. */
-@media (width <= 700px) {
-  .carousel-slider .carousel-slider-slides-container {
-    padding: 0 32px;
-  }
+.carousel-slider .carousel-slider-slide-indicator button {
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: #cfd8dc;
+  transition: background-color 0.2s;
+}
 
-  .carousel-slider .carousel-slider-slide {
-    width: 70%;
-  }
-
-  .carousel-slider .carousel-slider-slide:has(.carousel-slider-slide-content:empty) {
-    width: 40%;
-  }
+.carousel-slider .carousel-slider-slide-indicator button:disabled,
+.carousel-slider .carousel-slider-slide-indicator button:hover,
+.carousel-slider .carousel-slider-slide-indicator button:focus-visible {
+  background-color: var(--brand-green);
 }

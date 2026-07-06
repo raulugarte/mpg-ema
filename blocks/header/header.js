@@ -81,12 +81,27 @@ export default async function decorate(block) {
   // proxy — no hardcoded /content path and no guaranteed-404 first request.
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
-  const resp = await fetch(`${navPath}.plain.html`);
+  let resp = await fetch('/content/nav.plain.html');
+  if (!resp.ok) {
+    resp = await fetch(`${navPath}.plain.html`);
+  }
   if (!resp.ok) return;
 
   const html = await resp.text();
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
+
+  // Resolve relative asset paths (e.g. the logo `images/mpg-logo.svg`) against the
+  // nav fragment's own URL, not the host page. Without this, a relative src resolves
+  // against the current page path and 404s on any page at a different depth.
+  const fragmentBase = new URL('/content/nav.plain.html', window.location);
+  tmp.querySelectorAll('img[src]').forEach((img) => {
+    const src = img.getAttribute('src');
+    if (src && !src.startsWith('/') && !/^(https?:|data:)/i.test(src)) {
+      img.src = new URL(src, fragmentBase).href;
+    }
+  });
+
   const sections = [...tmp.children];
 
   const nav = document.createElement('nav');
