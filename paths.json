@@ -1,0 +1,7 @@
+{
+  "mappings": [
+    "/content/mpg-ema/:/",
+    "/content/mpg-ema/metadata:/metadata.json",
+    "/content/mpg-ema/configuration:/.helix/config.json"
+  ]
+}
