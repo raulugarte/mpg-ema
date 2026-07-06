@@ -1,11 +1,11 @@
 {
   "type": "xwalk",
-  "sites": {
-    "mpg-ema": {
-      "previewOrg": "raulugarte",
-      "previewSite": "mpg-ema",
-      "baseUrl": "https://www.mpg.de/en",
-      "libraryUrl": "https://main--sta-xwalk-boilerplate--aemysites.aem.page/tools/sidekick/library.json"
-    }
-  }
+  "libraryUrl": "https://main--sta-xwalk-boilerplate--aemysites.aem.page/tools/sidekick/library.json",
+  "previewOrg": "raulugarte",
+  "previewSite": "mpg-ema",
+  "contentHostUrl": "author-p130407-e1279066.adobeaemcloud.com",
+  "aemSitePath": "/content/mpg-ema",
+  "aemAssetsFolderPath": "/content/dam/mpg-ema",
+  "aemSiteName": "mpg-ema",
+  "aemSiteTitle": "mpg-ema"
 }
