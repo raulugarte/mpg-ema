@@ -34,6 +34,18 @@ rules in [INSTRUCTIONS.md](./INSTRUCTIONS.md).
   only.
 - If nav/footer are published at a non-root location, set `<meta name="nav">` /
   `<meta name="footer">` in page metadata rather than hardcoding a path in code.
+- **`head.html` carries NO nav/footer meta.** It is shared by every page in every
+  environment, so a `/content/`-prefixed value there resolves only on the local proxy
+  and produces empty header/footer on delivery. The blocks fall back to `/nav` /
+  `/footer` (the delivery paths) when metadata is absent — which is the intended
+  behavior. Migrated content is authored with **root** paths (e.g.
+  `content/en.plain.html` links to `/26798800/...`, not `/content/26798800/...`), so
+  root-path resolution is consistent site-wide.
+- **Local preview note:** locally, fragments are served at `/content/nav.plain.html`
+  and `/content/footer.plain.html` (repo `content/` dir). Since the code now targets
+  the root `/nav`/`/footer` (delivery-correct), local header/footer will only render if
+  the fragments are also reachable at root locally. This is expected — the code is
+  optimized for the real target (delivery), not the local proxy quirk.
 
 ## Blocks (migrated)
 
