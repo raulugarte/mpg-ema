@@ -5,7 +5,7 @@
    Values extracted from https://www.mpg.de/en computed styles. */
 
 header .nav-wrapper {
-  background-color: var(--background-color);
+  background-color: var(--grey-color, #eee);
   width: 100%;
 }
 

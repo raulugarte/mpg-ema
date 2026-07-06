@@ -1,0 +1,39 @@
+{
+  "variantName": "cards-teaser",
+  "baseBlock": "cards",
+  "version": "1.0.0",
+  "created": "2026-07-03T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.mpg.de/en",
+    "originPage": "Max Planck Society homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "compact",
+    "purpose": "news-research-teaser-grid",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "image + heading + date/tags + description (image optional for text-only teasers)",
+    "buttonCount": 0,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "news / research highlight grids",
+      "topic and career promo card grids",
+      "text-only teaser rows (image cell left empty)",
+      "upcoming events lists"
+    ],
+    "notSuitableFor": [
+      "single hero feature",
+      "rotating slider content (use carousel-slider)"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/en"],
+    "reuseCount": 1,
+    "lastUsed": "2026-07-03T00:00:00.000Z"
+  }
+}

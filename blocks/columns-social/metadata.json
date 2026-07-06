@@ -1,0 +1,38 @@
+{
+  "variantName": "columns-social",
+  "baseBlock": "columns",
+  "version": "1.0.0",
+  "created": "2026-07-03T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.mpg.de/en",
+    "originPage": "Max Planck Society homepage",
+    "blockPosition": "bottom"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "wide",
+    "purpose": "social-media-posts",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "two side-by-side cells, each with a post image + post text/author",
+    "buttonCount": 0,
+    "imageCount": 2
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "side-by-side social media posts",
+      "two-up informational blurbs with image + text",
+      "general two-column comparison layouts"
+    ],
+    "notSuitableFor": [
+      "scannable grids of many uniform items (use cards-teaser)",
+      "rotating content (use carousel-slider)"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/en"],
+    "reuseCount": 1,
+    "lastUsed": "2026-07-03T00:00:00.000Z"
+  }
+}

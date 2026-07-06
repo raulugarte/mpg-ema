@@ -12,6 +12,8 @@
  * governing permissions and limitations under the License.
  */
 
+@import url('brand.css');
+
 :root {
   /* colors (brand values live in brand.css; kept here as EDS aliases) */
   --light-color: #eee;
@@ -50,7 +52,7 @@
   src: local('Arial');
 }
 
-@media (width >= 900px) {
+@media (width <= 900px) {
   :root {
     /* body sizes */
     --body-font-size-m: 16px;
@@ -74,7 +76,7 @@ body {
   color: var(--text-color);
   font-family: var(--body-font-family);
   font-size: var(--body-font-size-m);
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 body.appear {
@@ -167,6 +169,31 @@ a:any-link {
 a:hover {
   color: var(--link-hover-color);
   text-decoration: underline;
+}
+
+/* EDS button reset — source CTAs ("more", "Further News") are plain green links */
+/* stylelint-disable no-descending-specificity */
+main .button-container {
+  display: inline;
+}
+
+main a.button:any-link {
+  background: none;
+  border: none;
+  border-radius: 0;
+  color: var(--link-color);
+  font-size: inherit;
+  font-weight: inherit;
+  padding: 0;
+  margin: 0;
+  text-decoration: none;
+  white-space: normal;
+}
+
+main a.button:hover {
+  color: var(--link-hover-color);
+  text-decoration: underline;
+  background: none;
 }
 
 /* buttons */
@@ -287,8 +314,30 @@ main > .section:first-of-type {
 
 /* section metadata */
 main .section.light,
-main .section.highlight {
-  background-color: var(--light-color);
+main .section.highlight,
+main .section.grey {
+  background-color: var(--grey-color);
+  margin: 0;
+  padding: 40px 0;
+}
+
+/* brand-green promo band (Topic Specials) */
+main .section.primary {
+  background-color: var(--brand-green);
+  margin: 0;
+  padding: 40px 0;
+}
+
+main .section.primary h1,
+main .section.primary h2,
+main .section.primary h3,
+main .section.primary a:any-link {
+  color: #fff;
+}
+
+main .section.dark {
+  background-color: var(--dark-color);
+  color: #fff;
   margin: 0;
   padding: 40px 0;
 }

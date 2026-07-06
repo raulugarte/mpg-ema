@@ -1,0 +1,188 @@
+/* Article left utility column — Contact, Further articles, Explore.
+   On desktop it floats into a narrow left column beside the article body;
+   on mobile it stacks below the article. */
+
+/* The global `main > .section:first-of-type { margin-top: 0 }` rule pulls the
+   article's first section flush against the header, tucking the title under the
+   nav bar. Restore top breathing room for the article layout. */
+main > .section:first-of-type:has(.article-aside) {
+  margin-top: 40px;
+}
+
+.article-aside {
+  font-family: var(--body-font-family);
+}
+
+.article-aside h3 {
+  font-family: var(--heading-font-family);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--text-color);
+  margin: 0 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--brand-green, #006c66);
+}
+
+.article-aside h3:not(:first-child) {
+  margin-top: 28px;
+}
+
+.article-aside p {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 8px;
+  color: var(--text-color);
+}
+
+.article-aside ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.article-aside li {
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+
+.article-aside a {
+  color: var(--link-color, #006c66);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.article-aside a:hover {
+  color: var(--link-hover-color, #055);
+  text-decoration: underline;
+}
+
+/* --- Top quick-links box: the FIRST list (before any heading) renders as the
+   source's stacked slate-blue link rows (white 15px text, full-width tappable
+   rows with light dividers), not plain green inline links. --- */
+.article-aside > ul:first-child {
+  margin: 0 0 21px;
+  border-bottom: 1px solid #eee;
+}
+
+.article-aside > ul:first-child li {
+  margin: 0;
+  line-height: normal;
+}
+
+.article-aside > ul:first-child a {
+  display: block;
+  padding: 10px 10px 10px 30px;
+  background: #455a64;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.7;
+  border-top: 1px solid #eee;
+  text-decoration: none;
+}
+
+.article-aside > ul:first-child a:hover {
+  background: #37474f;
+  color: #fff;
+  text-decoration: none;
+}
+
+
+/* --- Article body typography (scoped to the article layout only, so the
+   homepage's green H2s / larger body text are unaffected). Values extracted from
+   the source article at www.mpg.de: serif green title + subtitle, black serif H2
+   subheads, light Roboto body, unbulleted institute list. --- */
+.section:has(.article-aside) .default-content-wrapper h1 {
+  font-family: var(--heading-font-family);
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--brand-green, #006c66);
+  margin: 0 0 12px;
+}
+
+/* Subtitle / standfirst = the first paragraph right after the H1 */
+.section:has(.article-aside) .default-content-wrapper h1 + p {
+  font-family: var(--heading-font-family);
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--brand-green, #006c66);
+  margin: 0 0 12px;
+}
+
+.section:has(.article-aside) .default-content-wrapper h2 {
+  font-family: var(--heading-font-family);
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #000;
+  margin: 25px 0 8px;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.section:has(.article-aside) .default-content-wrapper p {
+  font-family: var(--body-font-family);
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: #000;
+  margin: 0 0 12px;
+}
+
+/* Institute list — source uses no bullet markers, modest indent */
+.section:has(.article-aside) .default-content-wrapper ul {
+  list-style: none;
+  padding-left: 30px;
+  margin: 12px 0;
+}
+
+.section:has(.article-aside) .default-content-wrapper ul li {
+  font-family: var(--body-font-family);
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: #000;
+}
+
+/* Desktop: the article body's default-content and the article-aside block live
+   in the SAME EDS section (no section break between them). Turn that section
+   into a two-column grid — narrow aside on the LEFT, article body on the RIGHT —
+   and reorder so the aside (which comes last in the DOM) sits first visually.
+   Constrain + centre the whole thing to the source's ~1170px container. */
+@media (width >= 900px) {
+  .section:has(.article-aside) {
+    display: grid;
+    grid-template-columns: 220px 848px;
+    column-gap: 40px;
+    align-items: start;
+    max-width: 1170px;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+  }
+
+  /* Aside → left column (DOM order is body then aside, so pin explicitly).
+     Override the global `main > .section > div { margin: auto }` — auto margins
+     on a grid item center it in its (tall) area, pushing the aside to the middle;
+     zeroing them lets it sit at the top of the row. */
+  .section:has(.article-aside) > .article-aside-wrapper {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    margin: 0;
+    max-width: none;
+    padding: 0;
+  }
+
+  /* Article body → right column. */
+  .section:has(.article-aside) > .default-content-wrapper {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    margin: 0;
+    max-width: none;
+    min-width: 0;
+  }
+}

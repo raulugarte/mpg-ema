@@ -1,0 +1,162 @@
+/* Block: cards-teaser — CSS derived from source computed styles (mpg.de/en News/teaser cards) */
+
+/* Grid: 3-up on desktop, cards ~360px wide, ~30px gutter (source col padding 0 15px) */
+.cards-teaser > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+}
+
+@media (width >= 700px) {
+  .cards-teaser > ul {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (width >= 900px) {
+  .cards-teaser > ul {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Card tile: white surface (stands out on the grey section band) */
+.cards-teaser > ul > li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background-color);
+  margin: 0 0 17px;
+}
+
+/* Image on top — 3:2 ratio (source 360x240), cover crop */
+.cards-teaser .cards-teaser-card-image {
+  position: relative;
+  line-height: 0;
+  overflow: hidden;
+}
+
+.cards-teaser .cards-teaser-card-image picture,
+.cards-teaser .cards-teaser-card-image img {
+  display: block;
+  width: 100%;
+}
+
+.cards-teaser .cards-teaser-card-image img {
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+
+  /* "trngl-left" angled bottom corner — approximated with a clip-path */
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 14px));
+
+  /* subtle zoom on card hover, matching the source teaser interaction */
+  transition: transform 0.4s ease;
+}
+
+.cards-teaser > ul > li:hover .cards-teaser-card-image img {
+  transform: scale(1.04);
+}
+
+/* Text box below image (source .text-box padding 25px 25px 10px) */
+.cards-teaser .cards-teaser-card-body {
+  padding: 25px 25px 10px;
+}
+
+/* Card heading link — Merriweather 22px/30.8px, brand green, dotted underline on hover */
+.cards-teaser .cards-teaser-card-body h2,
+.cards-teaser .cards-teaser-card-body h3,
+.cards-teaser .cards-teaser-card-body h4 {
+  margin: 0 0 15px;
+  font-family: var(--heading-font-family);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 30.8px;
+  color: var(--link-color);
+}
+
+.cards-teaser .cards-teaser-card-body h2 a,
+.cards-teaser .cards-teaser-card-body h3 a,
+.cards-teaser .cards-teaser-card-body h4 a,
+.cards-teaser .cards-teaser-card-body p a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.cards-teaser .cards-teaser-card-body h2 a:hover,
+.cards-teaser .cards-teaser-card-body h3 a:hover,
+.cards-teaser .cards-teaser-card-body h4 a:hover {
+  color: var(--link-hover-color);
+  text-decoration: underline dotted 1px;
+}
+
+.cards-teaser .cards-teaser-card-body p a:hover {
+  color: var(--link-hover-color);
+  text-decoration: underline;
+}
+
+/* Date line — source .attribute.date: 12px, weight 900, uppercase, letter-spacing 0.24px.
+   Authored as a leading <em> in the description paragraph (content-first). */
+.cards-teaser .cards-teaser-card-body p em {
+  display: block;
+  margin-bottom: 10px;
+  font-family: var(--body-font-family);
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.24px;
+  text-transform: uppercase;
+  color: var(--text-color);
+}
+
+/* Description paragraph — Roboto 16px/27.2px */
+.cards-teaser .cards-teaser-card-body p {
+  margin: 10px 0 0;
+  font-family: var(--body-font-family);
+  font-size: 16px;
+  line-height: 27.2px;
+  color: var(--text-color);
+}
+
+/* Inline "more" CTA — source: green, weight 300, with a leading chevron ("› more") */
+.cards-teaser .cards-teaser-card-body p a[title="more"],
+.cards-teaser .cards-teaser-card-body p a[aria-label="more"] {
+  margin-left: 4px;
+  font-weight: 300;
+  color: var(--link-color);
+  white-space: nowrap;
+}
+
+.cards-teaser .cards-teaser-card-body p a[title="more"]::before,
+.cards-teaser .cards-teaser-card-body p a[aria-label="more"]::before {
+  content: '\203A\00a0';
+}
+
+.cards-teaser .cards-teaser-card-body p a[title="more"]:hover,
+.cards-teaser .cards-teaser-card-body p a[aria-label="more"]:hover {
+  text-decoration: underline;
+  color: var(--link-hover-color);
+}
+
+/* --- Text-teaser variant: the 4 image-less cards directly under the hero.
+   They are 4-up, sit on grey tiles with a drop shadow, and overlap upward
+   into the hero image (source margin-top: -100px). Scoped via :has() to the
+   image-less cards-teaser so the News/Career image grids are unaffected. --- */
+.cards-teaser.block:not(:has(.cards-teaser-card-image)) > ul {
+  margin-top: -100px;
+  position: relative;
+  z-index: 2;
+}
+
+@media (width >= 900px) {
+  .cards-teaser.block:not(:has(.cards-teaser-card-image)) > ul {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.cards-teaser.block:not(:has(.cards-teaser-card-image)) > ul > li {
+  background-color: var(--grey-color, #eee);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+  margin: 0;
+}
