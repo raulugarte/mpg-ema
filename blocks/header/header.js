@@ -1,3 +1,5 @@
+import { getMetadata } from '../../scripts/aem.js';
+
 // media query match that indicates desktop width
 const isDesktop = window.matchMedia('(min-width: 900px)');
 
@@ -73,13 +75,13 @@ function handleViewportChange(nav, hamburger) {
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
-  // Fetch nav fragment: local dev server first (repo content/ served at
-  // /content/nav.plain.html), then the published AEM site path.
-  const navMeta = block.getAttribute('data-nav') || '/content/mpg-ema/nav';
-  let resp = await fetch('/content/nav.plain.html');
-  if (!resp.ok) {
-    resp = await fetch(`${navMeta}.plain.html`);
-  }
+  // Nav fragment path is metadata-driven (single source of truth): the page's
+  // `<meta name="nav">` if present, otherwise the site-root default `/nav`.
+  // Resolved to a pathname so it is portable across author, delivery and local
+  // proxy — no hardcoded /content path and no guaranteed-404 first request.
+  const navMeta = getMetadata('nav');
+  const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
+  const resp = await fetch(`${navPath}.plain.html`);
   if (!resp.ok) return;
 
   const html = await resp.text();
