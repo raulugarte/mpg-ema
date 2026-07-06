@@ -1,0 +1,37 @@
+{
+  "variantName": "cards-topic",
+  "baseBlock": "cards",
+  "version": "1.0.0",
+  "created": "2026-07-06T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.mpg.de/en",
+    "originPage": "Max Planck Society homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "accent",
+    "density": "compact",
+    "purpose": "topic",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "image + title teaser cards on a brand-colored (primary) inverted background",
+    "buttonCount": 0,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "topic/theme highlight rows on brand-colored sections",
+      "image+title card grids requiring inverted text styling"
+    ],
+    "notSuitableFor": [
+      "cards on plain white/grey backgrounds",
+      "text-only teaser rows"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/en"],
+    "reuseCount": 1,
+    "lastUsed": "2026-07-06T00:00:00.000Z"
+  }
+}

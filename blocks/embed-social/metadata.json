@@ -1,0 +1,37 @@
+{
+  "variantName": "embed-social",
+  "baseBlock": "embed",
+  "version": "1.0.0",
+  "created": "2026-07-06T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.mpg.de/en",
+    "originPage": "Max Planck Society homepage",
+    "blockPosition": "bottom"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "compact",
+    "purpose": "social-feed",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "optional placeholder image + social post URI",
+    "buttonCount": 0,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "embedded social media posts/feeds (Twitter/X, etc.)",
+      "'Social Media' homepage sections"
+    ],
+    "notSuitableFor": [
+      "standalone video embeds (use a video/embed-video variant)",
+      "static image content"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/en"],
+    "reuseCount": 1,
+    "lastUsed": "2026-07-06T00:00:00.000Z"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "variantName": "columns-events",
+  "baseBlock": "columns",
+  "version": "1.0.0",
+  "created": "2026-07-06T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.mpg.de/en",
+    "originPage": "Max Planck Society homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "spacious",
+    "purpose": "events",
+    "imagePattern": "noimg"
+  },
+  "contentPattern": {
+    "structure": "two side-by-side columns: calendar widget + upcoming-events list",
+    "buttonCount": 0,
+    "imageCount": 0
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "events sections with a calendar column and a list column",
+      "generic two-column informational layouts"
+    ],
+    "notSuitableFor": [
+      "repeating item card grids",
+      "single-column content"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/en"],
+    "reuseCount": 1,
+    "lastUsed": "2026-07-06T00:00:00.000Z"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "variantName": "cards-news",
+  "baseBlock": "cards",
+  "version": "1.0.0",
+  "created": "2026-07-06T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.mpg.de/en",
+    "originPage": "Max Planck Society homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "compact",
+    "purpose": "news",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "article teaser cards: image + linked title + excerpt",
+    "buttonCount": 0,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "news/article teaser rows with image + title + excerpt",
+      "International, Career and similar article-teaser sections"
+    ],
+    "notSuitableFor": [
+      "text-only teaser rows without images",
+      "brand-colored/inverted card sections"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/en"],
+    "reuseCount": 3,
+    "lastUsed": "2026-07-06T00:00:00.000Z",
+    "reusedInSections": ["news", "international", "career"]
+  }
+}

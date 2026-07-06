@@ -1,0 +1,99 @@
+{
+  "metadata": {
+    "projectType": "xwalk"
+  },
+  "templates": [
+    {
+      "name": "homepage",
+      "urls": [
+        "https://www.mpg.de/en"
+      ],
+      "representativeUrl": "https://www.mpg.de/en",
+      "coverageGaps": [],
+      "description": "Max Planck Society homepage: header/nav, hero teaser, multiple teaser/card rows across white/grey/primary bands, publications and institute-news sliders, events, and a green/darkgreen footer.",
+      "blocks": [
+        {
+          "name": "hero-teaser",
+          "instances": [
+            "#page_content > main > div.container-full-width.background-block.teaser-hero"
+          ]
+        },
+        {
+          "name": "cards-teasers",
+          "instances": [
+            "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(2)"
+          ]
+        },
+        {
+          "name": "cards-news",
+          "instances": [
+            "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(3)",
+            "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(4)",
+            "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(5)"
+          ]
+        },
+        {
+          "name": "cards-topic",
+          "instances": [
+            "#page_content > main > div.responsive_column.container-full-width.primary"
+          ]
+        },
+        {
+          "name": "carousel-slider",
+          "instances": [
+            "#page_content > main > div.container-full-width.white:nth-of-type(7)",
+            "#page_content > main > div.container-full-width.grey:nth-of-type(8)",
+            "#page_content > main > div.container-full-width.homepage_slider.grey"
+          ]
+        },
+        {
+          "name": "columns-events",
+          "instances": [
+            "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(9)"
+          ]
+        },
+        {
+          "name": "embed-social",
+          "instances": [
+            "#page_content > main > div.responsive_column.container-full-width.white:nth-of-type(11)"
+          ]
+        },
+        {
+          "name": "section-news",
+          "instances": [
+            "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(3)"
+          ],
+          "section": "grey"
+        },
+        {
+          "name": "section-career",
+          "instances": [
+            "#page_content > main > div.responsive_column.container-full-width.grey:nth-of-type(5)"
+          ],
+          "section": "grey"
+        },
+        {
+          "name": "section-topic-specials",
+          "instances": [
+            "#page_content > main > div.responsive_column.container-full-width.primary"
+          ],
+          "section": "primary"
+        },
+        {
+          "name": "section-from-the-institutes",
+          "instances": [
+            "#page_content > main > div.container-full-width.grey:nth-of-type(8)"
+          ],
+          "section": "grey"
+        },
+        {
+          "name": "section-multimedia",
+          "instances": [
+            "#page_content > main > div.container-full-width.homepage_slider.grey"
+          ],
+          "section": "grey"
+        }
+      ]
+    }
+  ]
+}

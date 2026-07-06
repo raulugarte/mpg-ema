@@ -1,20 +1,81 @@
 import { getMetadata } from '../../scripts/aem.js';
-import { loadFragment } from '../fragment/fragment.js';
 
 /**
  * loads and decorates the footer
  * @param {Element} block The footer block element
  */
 export default async function decorate(block) {
-  // load footer as fragment
+  // Footer fragment path is metadata-driven (single source of truth): the page's
+  // `<meta name="footer">` if present, otherwise the site-root default `/footer`.
+  // Dual-fetch: localhost/aem up first, then DA/EDS production path.
   const footerMeta = getMetadata('footer');
   const footerPath = footerMeta ? new URL(footerMeta, window.location).pathname : '/footer';
-  const fragment = await loadFragment(footerPath);
+  let resp = await fetch('/content/footer.plain.html');
+  if (!resp.ok) {
+    resp = await fetch(`${footerPath}.plain.html`);
+  }
+  if (!resp.ok) return;
 
-  // decorate footer DOM
+  const html = await resp.text();
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const sections = [...tmp.children];
+
   block.textContent = '';
   const footer = document.createElement('div');
-  while (fragment.firstElementChild) footer.append(fragment.firstElementChild);
+  footer.className = 'footer-inner';
 
+  // --- Section 0: green band (link columns + back-to-top) ---
+  const green = document.createElement('div');
+  green.className = 'footer-green';
+  const greenContainer = document.createElement('div');
+  greenContainer.className = 'footer-container';
+
+  const backToTop = document.createElement('a');
+  backToTop.className = 'footer-top';
+  backToTop.href = '#top';
+  backToTop.textContent = 'Top';
+  backToTop.setAttribute('aria-label', 'Back to top');
+  backToTop.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  if (sections[0]) {
+    // group each heading + following list into a column
+    const cols = document.createElement('div');
+    cols.className = 'footer-columns';
+    const nodes = [...sections[0].children];
+    let currentCol = null;
+    nodes.forEach((node) => {
+      if (/^H[1-6]$/.test(node.tagName)) {
+        currentCol = document.createElement('div');
+        currentCol.className = 'footer-column';
+        currentCol.append(node);
+        cols.append(currentCol);
+      } else if (node.tagName === 'UL') {
+        if (!currentCol) {
+          currentCol = document.createElement('div');
+          currentCol.className = 'footer-column';
+          cols.append(currentCol);
+        }
+        currentCol.append(node);
+      }
+    });
+    greenContainer.append(cols);
+  }
+  green.append(backToTop, greenContainer);
+
+  // --- Section 1: darkgreen legal bar ---
+  const dark = document.createElement('div');
+  dark.className = 'footer-subfooter';
+  const darkContainer = document.createElement('div');
+  darkContainer.className = 'footer-container';
+  if (sections[1]) {
+    while (sections[1].firstElementChild) darkContainer.append(sections[1].firstElementChild);
+  }
+  dark.append(darkContainer);
+
+  footer.append(green, dark);
   block.append(footer);
 }

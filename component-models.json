@@ -171,6 +171,63 @@
         "multi": false
       },
       {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Text",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "card",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false
+      },
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Text",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "card",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false
+      },
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Text",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "card",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false
+      },
+      {
         "component": "text",
         "valueType": "string",
         "name": "imageAlt",
@@ -179,6 +236,32 @@
       {
         "component": "richtext",
         "name": "text",
+        "value": "",
+        "label": "Text",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "carousel-slider-item",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "media_image",
+        "label": "Background Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_imageAlt",
+        "value": "",
+        "label": "Bacgkround Alt"
+      },
+      {
+        "component": "richtext",
+        "name": "content_text",
         "value": "",
         "label": "Text",
         "valueType": "string"
@@ -212,6 +295,25 @@
     ]
   },
   {
+    "id": "columns-events",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "number",
+        "name": "columns",
+        "value": "",
+        "label": "Columns"
+      },
+      {
+        "component": "text",
+        "valueType": "number",
+        "name": "rows",
+        "value": "",
+        "label": "Rows"
+      }
+    ]
+  },
+  {
     "id": "columns",
     "fields": [
       {
@@ -227,6 +329,31 @@
         "name": "rows",
         "value": "",
         "label": "Rows"
+      }
+    ]
+  },
+  {
+    "id": "embed-social",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "embed_placeholder",
+        "label": "Placeholder Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "embed_placeholderAlt",
+        "value": "",
+        "label": "Placeholder Image Alt Text"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "embed_uri",
+        "label": "URI"
       }
     ]
   },
@@ -278,6 +405,32 @@
         "component": "aem-content",
         "name": "reference",
         "label": "Reference"
+      }
+    ]
+  },
+  {
+    "id": "hero-teaser",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "imageAlt",
+        "label": "Alt",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Text",
+        "valueType": "string"
       }
     ]
   },

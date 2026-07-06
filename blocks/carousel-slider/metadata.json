@@ -1,0 +1,40 @@
+{
+  "variantName": "carousel-slider",
+  "baseBlock": "carousel",
+  "version": "1.0.0",
+  "created": "2026-07-06T00:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.mpg.de/en",
+    "originPage": "Max Planck Society homepage",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "compact",
+    "purpose": "slider",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "rotating slides: image/thumbnail + optional linked title",
+    "buttonCount": 0,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "publication cover sliders",
+      "institute news sliders",
+      "multimedia/video teaser sliders",
+      "any horizontally-rotating teaser gallery"
+    ],
+    "notSuitableFor": [
+      "static (non-rotating) card grids",
+      "single hero banners"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/en"],
+    "reuseCount": 3,
+    "lastUsed": "2026-07-06T00:00:00.000Z",
+    "reusedInSections": ["publications", "from-the-institutes", "multimedia"]
+  }
+}
