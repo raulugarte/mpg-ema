@@ -22,7 +22,7 @@ header nav .nav-brand {
   gap: 24px;
   background-color: #eee;
   padding: 0 32px;
-  min-height: 172px;
+  min-height: 123px;
 }
 
 header nav .nav-brand .nav-logo {
@@ -31,7 +31,7 @@ header nav .nav-brand .nav-logo {
 }
 
 header nav .nav-brand .nav-logo img {
-  height: 140px;
+  height: 111px;
   width: auto;
   display: block;
 }
@@ -89,7 +89,7 @@ header nav .nav-search-submit {
 /* --- Main navigation row (sits on the same grey band as the brand row) --- */
 header nav .nav-sections {
   background-color: #eee;
-  padding: 0 32px 20px;
+  padding: 0 32px 16px;
 }
 
 header nav .nav-list {
@@ -97,7 +97,7 @@ header nav .nav-list {
   margin: 0;
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 header nav .nav-item {

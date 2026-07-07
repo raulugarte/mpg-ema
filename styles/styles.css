@@ -31,8 +31,8 @@
   --heading-font-size-s: 18px;
   --heading-font-size-xs: 16px;
 
-  /* nav heights (brand row 172px + nav-links row 49px = 221px total) */
-  --nav-height: 221px;
+  /* nav heights (brand row 123px + nav-links row 45px = 168px total) */
+  --nav-height: 168px;
   --breadcrumbs-height: 34px;
   --header-height: var(--nav-height);
 }
@@ -64,6 +64,9 @@
     --heading-font-size-m: 16px;
     --heading-font-size-s: 14px;
     --heading-font-size-xs: 14px;
+
+    /* mobile: nav collapses to the compact brand row (logo + hamburger) */
+    --nav-height: 64px;
   }
 }
 
