@@ -91,6 +91,20 @@ export default async function decorate(block) {
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
 
+  // Normalize AEM export structure. md2jcr wraps each fragment paragraph's
+  // content in a <p> (so a list item becomes <li><p><a>…</a></p></li> and the
+  // logo/lang links become <p><a>…</a></p>), whereas the local aem-up proxy
+  // emits bare <a>. Unwrap any <p> whose only meaningful child is a single
+  // element (anchor or image) so both environments share one structure — this
+  // is what makes `.nav-item > a` (CSS) and `:scope > a` (trigger detection)
+  // match on author/delivery, not just locally.
+  tmp.querySelectorAll('p').forEach((p) => {
+    const kids = [...p.children];
+    if (kids.length === 1 && !p.textContent.replace(kids[0].textContent, '').trim()) {
+      p.replaceWith(kids[0]);
+    }
+  });
+
   // Resolve relative asset paths (e.g. the logo `images/mpg-logo.svg`) against the
   // nav fragment's own URL, not the host page. Without this, a relative src resolves
   // against the current page path and 404s on any page at a different depth.
@@ -102,79 +116,99 @@ export default async function decorate(block) {
     }
   });
 
-  const sections = [...tmp.children];
-
   const nav = document.createElement('nav');
   nav.id = 'nav';
   nav.setAttribute('aria-expanded', 'false');
 
-  // --- Section 0: brand + utility (logo, language toggle) ---
-  const brandSection = sections[0];
-  const navBrand = document.createElement('div');
-  navBrand.className = 'nav-brand';
-  if (brandSection) {
-    const paras = [...brandSection.querySelectorAll('p')];
-    // first paragraph = logo link; remaining = utility links (language)
-    if (paras[0]) {
-      const logo = paras[0].querySelector('a');
-      if (logo) {
-        logo.className = 'nav-logo';
-        navBrand.append(logo);
-      }
-    }
-    const tools = document.createElement('div');
-    tools.className = 'nav-tools';
-    paras.slice(1).forEach((p) => {
-      const a = p.querySelector('a');
-      if (a) {
-        a.className = 'nav-lang';
-        tools.append(a);
-      }
-    });
-    tools.append(buildSearchForm());
-    navBrand.append(tools);
+  // Detect content by WHAT it is, not by position. AEM's exported .plain.html
+  // wraps the fragment sections in extra <div>s (differently from the local
+  // aem-up proxy), so positional lookups like children[0]/children[1] break on
+  // author/delivery. Searching the whole fragment makes decoration portable.
+
+  // Main nav list = the top-most <ul> that has an <li> containing a nested <ul>
+  // (the dropdowns); fall back to the <ul> with the most <li> children.
+  const allLists = [...tmp.querySelectorAll('ul')];
+  let topUl = allLists.find((ul) => [...ul.children].some((li) => li.querySelector(':scope > ul')));
+  if (!topUl && allLists.length) {
+    topUl = allLists.reduce((a, b) => (b.children.length > a.children.length ? b : a));
   }
 
-  // --- Section 1: main nav ---
+  // The logo link is the anchor that wraps an <img> (or points at the home root);
+  // exclude any anchors that live inside the nav list.
+  const inList = (el) => topUl && topUl.contains(el);
+  const anchors = [...tmp.querySelectorAll('a')].filter((a) => !inList(a));
+  const logo = anchors.find((a) => a.querySelector('img'))
+    || anchors.find((a) => (a.getAttribute('href') || '') === '/en')
+    || anchors[0];
+  // Language link = an anchor whose text is a language name (not the logo).
+  const langLink = anchors.find((a) => a !== logo && /^(deutsch|english|de|en)$/i.test(a.textContent.trim()));
+
+  // --- Brand + utility (logo, language toggle, search) ---
+  const navBrand = document.createElement('div');
+  navBrand.className = 'nav-brand';
+  if (logo) {
+    logo.className = 'nav-logo';
+    // The logo SVG is served from the committed /icons folder rather than a
+    // fragment-relative image: SVG <img> tags in the plain fragment are
+    // dropped by md2jcr on AEM export, and content/images is not deployed.
+    // Rebuild (or fix) the logo image here so it renders in every environment.
+    let img = logo.querySelector('img');
+    if (!img) {
+      img = document.createElement('img');
+      logo.textContent = '';
+      logo.append(img);
+    }
+    img.src = '/icons/mpg-logo.svg';
+    if (!img.getAttribute('alt')) {
+      img.alt = 'Max Planck Society - go to homepage';
+    }
+    navBrand.append(logo);
+  }
+  const tools = document.createElement('div');
+  tools.className = 'nav-tools';
+  if (langLink) {
+    langLink.className = 'nav-lang';
+    tools.append(langLink);
+  }
+  tools.append(buildSearchForm());
+  navBrand.append(tools);
+
+  // --- Main nav ---
   const navSections = document.createElement('div');
   navSections.className = 'nav-sections';
-  const mainSection = sections[1];
-  if (mainSection) {
-    const topUl = mainSection.querySelector(':scope > ul');
-    if (topUl) {
-      topUl.className = 'nav-list';
-      [...topUl.children].forEach((li) => {
-        li.classList.add('nav-item');
-        const trigger = li.querySelector(':scope > a');
-        const panel = li.querySelector(':scope > ul');
-        if (panel) {
-          panel.classList.add('nav-panel');
-          li.setAttribute('aria-expanded', 'false');
-          // Placeholder anchor (#...) becomes a toggle for click/mobile
-          if (trigger && (trigger.getAttribute('href') || '').startsWith('#')) {
-            trigger.setAttribute('role', 'button');
-            trigger.setAttribute('aria-haspopup', 'true');
-            trigger.addEventListener('click', (e) => {
-              e.preventDefault();
-              const open = li.getAttribute('aria-expanded') === 'true';
-              closeAllPanels(topUl);
-              li.setAttribute('aria-expanded', open ? 'false' : 'true');
-            });
-          }
-          // Desktop hover behavior
-          li.addEventListener('mouseenter', () => {
-            if (isDesktop.matches) {
-              closeAllPanels(topUl);
-              li.setAttribute('aria-expanded', 'true');
-            }
-          });
-          li.addEventListener('mouseleave', () => {
-            if (isDesktop.matches) li.setAttribute('aria-expanded', 'false');
+  if (topUl) {
+    topUl.className = 'nav-list';
+    [...topUl.children].forEach((li) => {
+      li.classList.add('nav-item');
+      const trigger = li.querySelector(':scope > a');
+      const panel = li.querySelector(':scope > ul');
+      if (panel) {
+        panel.classList.add('nav-panel');
+        li.setAttribute('aria-expanded', 'false');
+        // Placeholder anchor (#...) becomes a toggle for click/mobile
+        if (trigger && (trigger.getAttribute('href') || '').startsWith('#')) {
+          trigger.setAttribute('role', 'button');
+          trigger.setAttribute('aria-haspopup', 'true');
+          trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            const open = li.getAttribute('aria-expanded') === 'true';
+            closeAllPanels(topUl);
+            li.setAttribute('aria-expanded', open ? 'false' : 'true');
           });
         }
-      });
-      navSections.append(topUl);
-    }
+        // Desktop hover behavior
+        li.addEventListener('mouseenter', () => {
+          if (isDesktop.matches) {
+            closeAllPanels(topUl);
+            li.setAttribute('aria-expanded', 'true');
+          }
+        });
+        li.addEventListener('mouseleave', () => {
+          if (isDesktop.matches) li.setAttribute('aria-expanded', 'false');
+        });
+      }
+    });
+    navSections.append(topUl);
   }
 
   // --- Hamburger (mobile) ---
