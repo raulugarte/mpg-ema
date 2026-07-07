@@ -91,6 +91,20 @@ export default async function decorate(block) {
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
 
+  // Normalize AEM export structure. md2jcr wraps each fragment paragraph's
+  // content in a <p> (so a list item becomes <li><p><a>…</a></p></li> and the
+  // logo/lang links become <p><a>…</a></p>), whereas the local aem-up proxy
+  // emits bare <a>. Unwrap any <p> whose only meaningful child is a single
+  // element (anchor or image) so both environments share one structure — this
+  // is what makes `.nav-item > a` (CSS) and `:scope > a` (trigger detection)
+  // match on author/delivery, not just locally.
+  tmp.querySelectorAll('p').forEach((p) => {
+    const kids = [...p.children];
+    if (kids.length === 1 && !p.textContent.replace(kids[0].textContent, '').trim()) {
+      p.replaceWith(kids[0]);
+    }
+  });
+
   // Resolve relative asset paths (e.g. the logo `images/mpg-logo.svg`) against the
   // nav fragment's own URL, not the host page. Without this, a relative src resolves
   // against the current page path and 404s on any page at a different depth.
