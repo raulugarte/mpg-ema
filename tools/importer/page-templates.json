@@ -94,6 +94,43 @@
           "section": "grey"
         }
       ]
+    },
+    {
+      "name": "article",
+      "urls": [
+        "https://www.mpg.de/26798800/democracy-cannot-be-taken-for-granted"
+      ],
+      "representativeUrl": "https://www.mpg.de/26798800/democracy-cannot-be-taken-for-granted",
+      "coverageGaps": [],
+      "description": "Max Planck Society article/detail page: header/nav, article body with title, subtitle, meta information (date + tags), inline figures with captions, body paragraphs, section headings and lists, a sidebar, a related-articles block, and green/darkgreen footer.",
+      "blocks": [
+        {
+          "name": "article-meta",
+          "instances": [
+            "#page_content > div.container.content-wrapper > div.row > main > article > div.content:nth-of-type(2) > div.meta-information"
+          ]
+        },
+        {
+          "name": "article-aside",
+          "instances": [
+            "#page_content > div.container.content-wrapper > div.row > aside.sidebar"
+          ]
+        },
+        {
+          "name": "cards-news",
+          "instances": [
+            "#related-articles-container"
+          ]
+        },
+        {
+          "name": "section-related-articles",
+          "instances": [
+            "#page_content > div.container-full-width.grey.hidden-print"
+          ],
+          "section": "grey",
+          "block": "cards-news"
+        }
+      ]
     }
   ]
 }

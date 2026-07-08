@@ -40,6 +40,12 @@
     ]
   },
   {
+    "id": "cards-teaser",
+    "components": [
+      "card"
+    ]
+  },
+  {
     "id": "cards-teasers",
     "components": [
       "card"
@@ -71,6 +77,21 @@
   },
   {
     "id": "columns-events",
+    "components": [
+      "column"
+    ]
+  },
+  {
+    "id": "column",
+    "components": [
+      "text",
+      "image",
+      "button",
+      "title"
+    ]
+  },
+  {
+    "id": "columns-social",
     "components": [
       "column"
     ]

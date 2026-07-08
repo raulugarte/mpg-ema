@@ -40,6 +40,25 @@
  * Metadata table is inserted as the band's next sibling (end of the section's
  * content), and the <hr> is inserted before the band (start of the section).
  *
+ * ── Multi-page support (homepage + article) ─────────────────────────────────
+ * This transformer is reused site-wide (homepage import script today; the
+ * article import script will register it too). The index-based BAND_STYLE_MAP
+ * above is HOMEPAGE-SPECIFIC and must only be applied to the homepage — on the
+ * article page there is exactly ONE parsed cards-news table (the grey
+ * "Other Interesting Articles" related-articles strip). Feeding that single
+ * instance through the homepage map (cards-news idx 0 = grey) would style it
+ * correctly by accident, but the coupling is fragile and semantically wrong.
+ *
+ * Instead we select the styling rule from the ACTIVE template:
+ *   - Templates whose section list (page-templates.json section-* entries,
+ *     surfaced as payload.template.sections OR payload.template.blocks[] whose
+ *     name starts with "section-") is available drive styling from that data:
+ *     each styled section names a block + style; we apply that style to the Nth
+ *     parsed table of that block type (document order). This handles the article
+ *     (single cards-news -> grey) without any homepage index assumptions.
+ *   - Otherwise (homepage import script embeds no section list) we fall back to
+ *     the homepage BAND_STYLE_MAP, so homepage output is byte-for-byte unchanged.
+ *
  * WebImporter globals are resolved defensively: mpg.de is an AMD/RequireJS page,
  * so the injected helix-importer UMD bundle may register as an AMD module rather
  * than attaching WebImporter to the global scope. Native fallbacks keep the
@@ -49,9 +68,11 @@
 const TransformHook = { beforeTransform: 'beforeTransform', afterTransform: 'afterTransform' };
 
 /**
- * Which parsed-block instances are styled bands, keyed by parsed block name and
- * that block's document-order instance index (0-based). Mirrors the section-*
- * pseudo-blocks in page-templates.json, translated onto the post-parse DOM.
+ * HOMEPAGE-ONLY fallback. Which parsed-block instances are styled bands, keyed
+ * by parsed block name and that block's document-order instance index (0-based).
+ * Mirrors the homepage section-* pseudo-blocks in page-templates.json, translated
+ * onto the post-parse DOM. Only used when the active template carries no section
+ * list (i.e. the homepage import script).
  */
 const BAND_STYLE_MAP = {
   'cards-news': { 0: 'grey', 2: 'grey' }, // News, Career (index 1 = International, white)
@@ -83,32 +104,141 @@ function computeBlockName(name) {
     .replace(/^(.)/g, (s) => s.toUpperCase());
 }
 
+/**
+ * Read the styled-section rules carried by the ACTIVE template, if any.
+ *
+ * page-templates.json expresses styled bands either as a `sections` array
+ * (each entry may have { block, style }) or as `blocks[]` pseudo-entries whose
+ * name starts with "section-" and carry a `section`/`style` value. The article
+ * template surfaces the latter (section-related-articles -> cards-news, grey).
+ *
+ * Returns a per-block style map keyed by canonical parsed block name and the
+ * document-order instance index of that block, e.g. { 'cards-news': { 0: 'grey' } },
+ * or null when the template carries no section list (homepage import script) so
+ * the caller can fall back to the hardcoded homepage BAND_STYLE_MAP.
+ */
+function styleMapFromTemplate(payload) {
+  const template = payload && payload.template;
+  if (!template) return null;
+
+  // Real (non-section) block entries, used to resolve which parsed block a
+  // section-* band maps to AND at which document-order instance index. The index
+  // MUST be the real block's own instance position (its offset within its
+  // instances[] list = its document-order occurrence among tables of that block
+  // type), NOT the order the section-* entries appear. Otherwise a homepage where
+  // only some cards-news instances are styled (idx 0 and 2) would collapse to
+  // idx 0 and 1 and mis-style the wrong bands.
+  const realBlocks = Array.isArray(template.blocks)
+    ? template.blocks.filter((b) => b && typeof b.name === 'string' && !b.name.startsWith('section-'))
+    : [];
+
+  // Given a section selector, find { block, index } of the real block instance it
+  // corresponds to: the real block whose instances[] contains that exact selector,
+  // or (band-wrapper case) whose instance selector is a descendant string of the
+  // section band selector. index = position within that block's instances[].
+  function resolveBlockInstance(sectionSelectors, explicitBlock) {
+    for (let b = 0; b < realBlocks.length; b += 1) {
+      const rb = realBlocks[b];
+      if (explicitBlock && rb.name !== explicitBlock) continue;
+      const instances = Array.isArray(rb.instances) ? rb.instances : [];
+      for (let i = 0; i < instances.length; i += 1) {
+        const rbSel = instances[i];
+        const hit = sectionSelectors.some(
+          (secSel) => rbSel === secSel || rbSel.indexOf(secSel) !== -1 || secSel.indexOf(rbSel) !== -1,
+        );
+        if (hit) return { block: rb.name, index: i };
+      }
+    }
+    // Explicit block named but no selector match: assume its first (only) instance.
+    if (explicitBlock) {
+      const rb = realBlocks.find((x) => x.name === explicitBlock);
+      if (rb) return { block: explicitBlock, index: 0 };
+    }
+    return null;
+  }
+
+  // Collect { block, index, style } rules from whichever shape the template exposes.
+  const rules = [];
+
+  if (Array.isArray(template.sections)) {
+    template.sections.forEach((section) => {
+      if (!section) return;
+      const style = section.style || section.section;
+      if (!style) return;
+      const selectors = Array.isArray(section.instances)
+        ? section.instances
+        : (section.selector ? [section.selector] : []);
+      const resolved = resolveBlockInstance(selectors, section.block);
+      if (resolved) rules.push({ ...resolved, style });
+    });
+  }
+
+  if (Array.isArray(template.blocks)) {
+    template.blocks.forEach((blockDef) => {
+      if (!blockDef || typeof blockDef.name !== 'string') return;
+      if (!blockDef.name.startsWith('section-')) return;
+      const style = blockDef.style || blockDef.section;
+      if (!style) return;
+      const selectors = Array.isArray(blockDef.instances) ? blockDef.instances : [];
+      const resolved = resolveBlockInstance(selectors, blockDef.block);
+      if (resolved) rules.push({ ...resolved, style });
+    });
+  }
+
+  if (rules.length === 0) return null;
+
+  // Group by block name, keyed by the real instance index (document order).
+  const map = {};
+  rules.forEach(({ block, index, style }) => {
+    map[block] = map[block] || {};
+    map[block][index] = style;
+  });
+  return map;
+}
+
 // Lookup: normalized header text -> canonical block name (for the block types
-// we style). e.g. "cards news" -> "cards-news".
+// the homepage fallback styles). e.g. "cards news" -> "cards-news".
 const BLOCK_NAME_BY_HEADER = Object.keys(BAND_STYLE_MAP).reduce((acc, name) => {
   acc[norm(computeBlockName(name))] = name;
   return acc;
 }, {});
 
 /**
+ * Build a header-text -> canonical-block-name lookup for an arbitrary style map
+ * (so template-driven maps can name any block type, not just the homepage set).
+ */
+function headerLookupFor(styleMap) {
+  return Object.keys(styleMap).reduce((acc, name) => {
+    acc[norm(computeBlockName(name))] = name;
+    return acc;
+  }, {});
+}
+
+/**
  * Read the first header cell text of a parsed block table. A parsed block table
  * has structure <table><tr><th>Block Name</th>...</tr>...</table>.
+ * A block may carry a variant suffix in its header ("Cards News (carousel)");
+ * strip the trailing "(...)" so matching keys off the canonical block name.
  */
 function blockTableHeaderName(table) {
   const firstRow = table.querySelector(':scope > tbody > tr, :scope > tr');
   if (!firstRow) return '';
   const th = firstRow.querySelector(':scope > th');
   if (!th) return '';
-  return norm(th.textContent);
+  return norm(th.textContent.replace(/\s*\([^)]*\)\s*$/, ''));
 }
 
 /**
  * Locate the styled bands among the POST-PARSE DOM. Walks every block table
  * under `element` in document order, tracks a per-block-name instance counter,
- * and returns { el, style } for each instance that BAND_STYLE_MAP marks styled.
+ * and returns { el, style } for each instance the given styleMap marks styled.
  * Order matches document order (top to bottom).
+ *
+ * @param {Element} element    root to search under
+ * @param {Object}  styleMap   { blockName: { instanceIdx: style } }
+ * @param {Object}  headerMap  normalized header text -> canonical block name
  */
-function resolveStyledBands(element) {
+function resolveStyledBands(element, styleMap, headerMap) {
   const doc = element.ownerDocument || document;
   const root = element || doc.body;
   const tables = Array.from(root.querySelectorAll('table'));
@@ -117,13 +247,13 @@ function resolveStyledBands(element) {
 
   tables.forEach((table) => {
     const header = blockTableHeaderName(table);
-    const blockName = BLOCK_NAME_BY_HEADER[header];
+    const blockName = headerMap[header];
     if (!blockName) return; // not a block type we style (or a metadata table)
 
     const idx = perName[blockName] || 0;
     perName[blockName] = idx + 1;
 
-    const style = BAND_STYLE_MAP[blockName][idx];
+    const style = styleMap[blockName] && styleMap[blockName][idx];
     if (style) bands.push({ el: table, style });
   });
 
@@ -158,9 +288,19 @@ export default function transform(hookName, element, payload) {
   const wi = getWebImporter();
   const doc = element.ownerDocument || document;
 
+  // Choose the styling rule for the ACTIVE page:
+  //  - Template-driven when the active template carries a resolvable section
+  //    list (e.g. the article template -> single cards-news band = grey). This
+  //    avoids applying homepage index assumptions to other templates.
+  //  - Homepage fallback (hardcoded BAND_STYLE_MAP) when the template exposes no
+  //    section list, so homepage output is unchanged.
+  const templateMap = styleMapFromTemplate(payload);
+  const styleMap = templateMap || BAND_STYLE_MAP;
+  const headerMap = templateMap ? headerLookupFor(templateMap) : BLOCK_NAME_BY_HEADER;
+
   // Anchor styled bands among the parsed block tables (source selectors are
   // gone by now — the parsers replaced them with these tables).
-  const bands = resolveStyledBands(element);
+  const bands = resolveStyledBands(element, styleMap, headerMap);
 
   // Process in reverse document order so DOM insertions don't shift earlier
   // anchors (each anchor is captured as a live node reference, but inserting
@@ -181,11 +321,28 @@ export default function transform(hookName, element, payload) {
       }
     }
 
-    // Section break BEFORE this band, so it starts a new EDS section — but only
-    // when there is preceding content (i.e. the band is not the first child).
-    if (el.previousElementSibling) {
+    // Section break BEFORE this band, so it starts a new EDS section. The band
+    // is often preceded by its own section heading (e.g. the article's
+    // "Other Interesting Articles" <h2>, emitted by the parser as a sibling just
+    // before the block table). That heading belongs INSIDE the styled section,
+    // so place the <hr> before the heading — not between heading and band —
+    // otherwise the heading is stranded at the end of the previous section.
+    let breakBefore = el;
+    const prev = el.previousElementSibling;
+    if (prev && /^H[1-6]$/.test(prev.tagName)) {
+      breakBefore = prev;
+    }
+    // Insert the break as long as the band is not literally the very first
+    // content on the page. Use document-order position rather than just
+    // previousElementSibling: the band may be the first child of its own
+    // wrapper yet still follow the whole article body, so a sibling check alone
+    // wrongly skips the break (leaving the styled section merged with the
+    // article body and turning the whole page grey).
+    const allElements = Array.from((element || doc.body).querySelectorAll('*'));
+    const isFirstContent = allElements.indexOf(breakBefore) <= 0;
+    if (!isFirstContent) {
       const hr = doc.createElement('hr');
-      el.parentNode.insertBefore(hr, el);
+      breakBefore.parentNode.insertBefore(hr, breakBefore);
     }
   }
 }
