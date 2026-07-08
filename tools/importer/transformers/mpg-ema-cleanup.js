@@ -21,6 +21,26 @@
  * this page it wraps the social-media-box embeds (Facebook/Bluesky) which are
  * authorable content extracted by the embed-social parser.
  *
+ * ── Article/detail page chrome (additive; from page-structure.json outOfScope) ──
+ * The article template (e.g. /26798800/democracy-cannot-be-taken-for-granted)
+ * carries page chrome the homepage does not. Verified against
+ * migration-work/cleaned.html:
+ *   - <div class="content py-0"> (line 533) wraps ONLY
+ *       <div class="noindex"><nav class="hidden-print"><ol class="breadcrumb">…
+ *     i.e. auto-generated breadcrumb navigation. The whole py-0 utility div is
+ *     removed (it holds no authored content). We target the breadcrumb precisely
+ *     rather than every ".py-0" or ".hidden-print".
+ *   - <nav class="hidden-print"> (line 535) breadcrumb list — auto-generated nav.
+ *   - <div class="social-media-buttons hidden-print"> (line 566) auto-generated
+ *     share-widget row. It lives INSIDE the authored <div class="content"> next
+ *     to the h1/subtitle/meta/figures, so ONLY this element is removed — never
+ *     its container.
+ *
+ * ⚠️ The related-articles band <div class="container-full-width grey hidden-print">
+ * (line 925) is IN SCOPE (parsed as cards-news). We must NOT remove by the broad
+ * ".hidden-print" class — only the precise breadcrumb/share selectors below.
+ * These selectors do not exist on the homepage, so adding them is safe there.
+ *
  * Removal is done via WebImporter.DOMUtils.remove when available, with a native
  * fallback. mpg.de is an AMD/RequireJS page: when a `define` loader is present,
  * the injected helix-importer UMD bundle registers as an AMD module instead of
@@ -48,6 +68,20 @@ export default function transform(hookName, element, payload) {
     // Remove duplicated carousel slides injected by slick before block parsing,
     // so parsers don't extract cloned/duplicate cards from the sliders.
     removeAll(element, ['.slick-cloned']);
+
+    // Article figures carry BOTH a screen version and a print-only duplicate:
+    //   image:   <picture> (screen)  +  <img class="visible-print-block banner"> (print)
+    //   caption: div.description.hidden-print  +  div.description.visible-print
+    //   credit:  p.copyright.hidden-print       +  div.copyright.visible-print
+    // Without removing the print copies, every image and caption imports twice.
+    // Strip the print-only variants up front (before parsing) so only the
+    // on-screen version survives. Scoped to the print classes so the in-scope
+    // screen content (.hidden-print elements) is untouched.
+    removeAll(element, [
+      'img.visible-print-block',
+      '.description.visible-print',
+      '.copyright.visible-print',
+    ]);
   }
 
   if (hookName === TransformHook.afterTransform) {
@@ -58,6 +92,16 @@ export default function transform(hookName, element, payload) {
       'header.visible-print-block',
       'footer',
       '.pwa-settings-panel',
+      // Article/detail page chrome (see docblock). Precise selectors only — the
+      // related-articles band shares the .hidden-print class but is in scope.
+      'div.content.py-0', // breadcrumb wrapper (holds only nav.hidden-print)
+      'nav.hidden-print', // breadcrumb navigation list
+      'div.social-media-buttons', // auto-generated share-widget row
+      'div.print-footer', // print/editor chrome (Web-View, Print Page, Estimated DIN-A4)
+      '#go_to_live', // editor overlay (Go to Editor View)
+      '#slick_container_js', // fullscreen image-gallery lightbox (duplicated captions, Next/Esc)
+      '.fullscreen-slick', // same gallery lightbox (class fallback if id differs at runtime)
+      '.slick-grid-close-icon', // gallery close control (holds the stray "Esc" text)
       'iframe',
       'link',
       'noscript',

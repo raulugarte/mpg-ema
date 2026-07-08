@@ -1,0 +1,41 @@
+{
+  "definitions": [
+    {
+      "title": "Article Meta",
+      "id": "article-meta",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Article Meta",
+              "model": "article-meta"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "article-meta",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "date",
+          "value": "",
+          "label": "Date"
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "tags",
+          "value": "",
+          "label": "Category Tags"
+        }
+      ]
+    }
+  ],
+  "filters": []
+}

@@ -88,6 +88,48 @@ main > .section:first-of-type:has(.article-aside) {
   text-decoration: none;
 }
 
+/* --- Further articles: each teaser is a full-width thumbnail stacked above its
+   headline (matches the source's vertical horizontal-teaser layout). The parser
+   emits one paragraph per entry holding a linked <picture> then a linked
+   headline; md2jcr strips the authoring class, so target the teaser paragraphs
+   structurally — they are the only aside paragraphs that contain an image. --- */
+/* stylelint-disable no-descending-specificity */
+.article-aside p:has(picture) {
+  margin: 0 0 20px;
+}
+
+.article-aside p:has(picture) a {
+  font-size: inherit;
+}
+
+.article-aside p:has(picture) picture {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.article-aside p:has(picture) picture img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+/* the headline link (the anchor that is NOT wrapping the image) */
+.article-aside p:has(picture) a:last-child {
+  display: block;
+  font-family: var(--heading-font-family);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--brand-green, #006c66);
+}
+
+.article-aside p:has(picture) a:last-child:hover {
+  color: var(--link-hover-color, #00201e);
+  text-decoration: underline;
+}
+
 
 /* --- Article body typography (scoped to the article layout only, so the
    homepage's green H2s / larger body text are unaffected). Values extracted from
@@ -121,7 +163,6 @@ main > .section:first-of-type:has(.article-aside) {
   margin: 25px 0 8px;
 }
 
-/* stylelint-disable-next-line no-descending-specificity */
 .section:has(.article-aside) .default-content-wrapper p {
   font-family: var(--body-font-family);
   font-size: 14px;
@@ -152,36 +193,40 @@ main > .section:first-of-type:has(.article-aside) {
    and reorder so the aside (which comes last in the DOM) sits first visually.
    Constrain + centre the whole thing to the source's ~1170px container. */
 @media (width >= 900px) {
+  /* Two-column article layout: a narrow aside on the LEFT, article body on the
+     RIGHT (mirrors the source's Bootstrap col-md-pull/push). The article body is
+     split into several sibling wrappers because the article-meta block sits
+     between the title and the figures, and the aside is DOM-last. CSS grid can't
+     be used cleanly here — grid row tracks span both columns, so the tall aside
+     inflates the first body row and pushes the meta line far below the subtitle.
+     Instead the aside is taken out of flow (absolute, top-left of the relatively
+     positioned section) so it never affects body row heights, and every body
+     wrapper is inset past the aside with a left margin, stacking tightly under
+     the title in DOM order. The article body is always taller than the aside on
+     this template, so there is no bottom-overlap risk. */
   .section:has(.article-aside) {
-    display: grid;
-    grid-template-columns: 220px 848px;
-    column-gap: 40px;
-    align-items: start;
+    position: relative;
     max-width: 1170px;
     margin-left: auto;
     margin-right: auto;
-    justify-content: center;
   }
 
-  /* Aside → left column (DOM order is body then aside, so pin explicitly).
-     Override the global `main > .section > div { margin: auto }` — auto margins
-     on a grid item center it in its (tall) area, pushing the aside to the middle;
-     zeroing them lets it sit at the top of the row. */
+  /* Aside → absolutely positioned left column. Override global centering margins. */
   .section:has(.article-aside) > .article-aside-wrapper {
-    grid-column: 1;
-    grid-row: 1;
-    align-self: start;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 220px;
     margin: 0;
     max-width: none;
     padding: 0;
   }
 
-  /* Article body → right column. */
-  .section:has(.article-aside) > .default-content-wrapper {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: start;
-    margin: 0;
+  /* Article body wrappers → inset past the 220px aside + 40px gutter, stacking
+     in normal flow directly under one another. */
+  .section:has(.article-aside) > .default-content-wrapper,
+  .section:has(.article-aside) > .article-meta-wrapper {
+    margin: 0 0 0 260px;
     max-width: none;
     min-width: 0;
   }

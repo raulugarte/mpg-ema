@@ -119,3 +119,100 @@
   line-height: 1.7;
   color: #000;
 }
+
+/* =====================================================================
+   Carousel variant — article "Other Interesting Articles" strip.
+   The cards scroll horizontally (scroll-snap) with prev/next arrows,
+   mirroring the source's slick slider. Homepage grids are unaffected.
+   ===================================================================== */
+.cards-news.carousel {
+  position: relative;
+}
+
+.cards-news.carousel > ul {
+  display: flex;
+  grid-template-columns: none;
+  gap: 30px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.cards-news.carousel > ul::-webkit-scrollbar {
+  display: none;
+}
+
+/* fixed-width cards on the track (source shows ~4 across the 1170px band) */
+.cards-news.carousel > ul > li {
+  flex: 0 0 auto;
+  width: 270px;
+  scroll-snap-align: start;
+  margin-bottom: 0;
+}
+
+@media (width <= 900px) {
+  .cards-news.carousel > ul > li {
+    width: 80%;
+  }
+}
+
+/* prev/next arrow controls */
+.cards-news-carousel-nav {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.cards-news-carousel-btn {
+  pointer-events: auto;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--brand-green, #006c66);
+  cursor: pointer;
+  position: relative;
+  flex: 0 0 auto;
+  opacity: 0.9;
+}
+
+.cards-news-carousel-btn:hover {
+  background: var(--link-hover-color, #00201e);
+  opacity: 1;
+}
+
+.cards-news-carousel-prev {
+  transform: translateX(-50%);
+}
+
+.cards-news-carousel-next {
+  transform: translateX(50%);
+}
+
+/* chevron glyphs */
+.cards-news-carousel-btn::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #fff;
+  border-right: 2px solid #fff;
+}
+
+.cards-news-carousel-prev::before {
+  transform: translate(-30%, -50%) rotate(-135deg);
+}
+
+.cards-news-carousel-next::before {
+  transform: translate(-70%, -50%) rotate(45deg);
+}

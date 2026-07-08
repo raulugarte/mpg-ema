@@ -8,8 +8,16 @@
  *   - Quick links box (Science Magazine, Events, ...)
  *
  * Emitted as one block, one row, one cell of clean rich text (headings + lists),
- * so it authors as ordinary sidebar content. No images are carried (the source
- * "further articles" thumbnails are decorative placeholders).
+ * so it authors as ordinary sidebar content.
+ *
+ * ⚠️ NO IMAGES may be carried. The model has a SINGLE `content` richtext field
+ * mapped to the one body cell. In md2jcr's grid-table processing a richtext
+ * field is greedy but STOPS at the first image; the `content` field is then
+ * consumed, leaving the image node with no remaining column to map to — which
+ * throws "The content isn't mapping to the model correctly…". Verified by
+ * reproducing md2jcr@1.2.11 against this exact model: any <img> in the cell
+ * fails, link/text-only content maps cleanly. So the "further articles"
+ * thumbnails are dropped and each teaser is emitted as a plain linked headline.
  */
 export default function parse(element, { document }) {
   const parts = [];
@@ -75,49 +83,45 @@ export default function parse(element, { document }) {
     }
   }
 
-  // --- Further articles (linked headlines) ---
-  // NOTE: headline links only — no thumbnails. The block's model has a single
-  // `content` richtext field, and a richtext field stops consuming at the first
-  // <img> (md2jcr greedy-richtext rule). Mixing images into this one field leaves
-  // trailing nodes with no field to map to, which fails md2jcr with
-  // "content isn't mapping to the model". Keeping the list text-only keeps the
-  // whole aside inside one richtext field.
+  // --- Further articles (linked headlines only) ---
+  // The block has a single `content` richtext field mapped to the one body cell.
+  // Images CANNOT appear here (see docblock): md2jcr's greedy richtext stops at
+  // the first image and then has no column left for it. Emit each teaser as a
+  // plain linked headline in a <ul> — no thumbnails.
   const groups = element.querySelectorAll('.group-extension');
   groups.forEach((g) => {
     if (!/further articles/i.test(g.textContent)) return;
-    addHeading('Further articles');
+
     const ul = document.createElement('ul');
-    // Prefer the structured .teaser-extension entries (one headline each).
+    const seen = new Set();
     const teasers = Array.from(g.querySelectorAll('.teaser-extension'));
-    if (teasers.length) {
-      teasers.forEach((t) => {
-        const headlineA = t.querySelector('.text-box a[href], .meta-information a[href]')
-          || t.querySelector('a[href]');
-        if (!headlineA || !headlineA.textContent.trim()) return;
-        const li = document.createElement('li');
-        const link = document.createElement('a');
-        link.setAttribute('href', headlineA.getAttribute('href'));
-        link.textContent = headlineA.textContent.trim();
-        li.appendChild(link);
-        ul.appendChild(li);
-      });
-    } else {
-      // Fallback: headline links only (no structured teasers found).
-      const seen = new Set();
-      g.querySelectorAll('a[href]').forEach((a) => {
+    const sources = teasers.length ? teasers : [g];
+
+    sources.forEach((t) => {
+      const headlineA = t.querySelector('.text-box a[href], .meta-information a[href]')
+        || t.querySelector('a[href]');
+      // When falling back to the whole group, iterate all anchors instead.
+      const anchors = teasers.length
+        ? (headlineA ? [headlineA] : [])
+        : Array.from(t.querySelectorAll('a[href]'));
+      anchors.forEach((a) => {
         const href = a.getAttribute('href');
-        const text = a.textContent.trim();
-        if (!text || seen.has(href)) return;
+        const label = a.textContent.trim();
+        if (!label || seen.has(href)) return;
         seen.add(href);
         const li = document.createElement('li');
         const link = document.createElement('a');
         link.setAttribute('href', href);
-        link.textContent = text;
+        link.textContent = label;
         li.appendChild(link);
         ul.appendChild(li);
       });
+    });
+
+    if (ul.children.length) {
+      addHeading('Further articles');
+      parts.push(ul);
     }
-    if (ul.children.length) parts.push(ul);
   });
 
   // Nothing to author — unwrap so the aside simply disappears.

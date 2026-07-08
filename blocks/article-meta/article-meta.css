@@ -1,0 +1,64 @@
+/* article-meta: date line + category tag pills, matching mpg.de source */
+
+.article-meta {
+  display: block;
+  margin: 0 0 4px;
+}
+
+/* Date: small, bold, uppercase grey (source: Roboto 12px/900, #49494b) */
+.article-meta .article-meta-date {
+  color: #49494b;
+  font-family: var(--body-font-family);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.24px;
+  line-height: 1.4;
+}
+
+.article-meta .article-meta-date p {
+  margin: 0;
+}
+
+/* Tags row: pills sit inline on one line */
+.article-meta .article-meta-tags {
+  display: block;
+  margin-top: 6px;
+}
+
+.article-meta .article-meta-tags p {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Tag pill: solid grey-blue badge, near-rectangular (source: #455a64 bg, #fff,
+   12px/500, padding 2.4px 8.4px, border-radius 2.4px) */
+.article-meta .article-meta-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  border: none;
+  border-radius: 2px;
+  background-color: #455a64;
+  color: #fff;
+  font-family: var(--body-font-family);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.article-meta .article-meta-tag:any-link {
+  color: #fff;
+  text-decoration: none;
+}
+
+.article-meta .article-meta-tag:hover,
+.article-meta .article-meta-tag:focus {
+  background-color: #37474f;
+  color: #fff;
+  text-decoration: none;
+}

@@ -1,0 +1,38 @@
+{
+  "variantName": "article-aside",
+  "baseBlock": "article-aside",
+  "version": "1.0.0",
+  "created": "2026-07-07T16:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.mpg.de/26798800/democracy-cannot-be-taken-for-granted",
+    "originPage": "article / news detail page",
+    "blockPosition": "right sidebar / utility column"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "compact",
+    "purpose": "article-aside",
+    "imagePattern": "icon"
+  },
+  "contentPattern": {
+    "structure": "rich-text utility aside column: link lists, press contact, related-link teasers",
+    "buttonCount": 0,
+    "imageCount": 0
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "article/news detail right-hand sidebar (More Information links, press contact, related teasers)",
+      "any rich-text utility column alongside main article content"
+    ],
+    "notSuitableFor": [
+      "primary page content sections",
+      "image card grids or teaser rows (use a cards variant)"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/26798800/democracy-cannot-be-taken-for-granted"],
+    "reuseCount": 1,
+    "lastUsed": "2026-07-07T16:00:00.000Z",
+    "reusedInSections": ["sidebar-aside"]
+  }
+}
