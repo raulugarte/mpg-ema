@@ -117,8 +117,35 @@
   box-sizing: border-box;
   min-height: 250px;
   padding: 10px 15px;
-  background-color: #263238;   /* source box-color bg-grey */
+  background-color: #263238;   /* fallback; overridden by the colour cycle below */
   color: #fff;
+}
+
+/* Source cycles each box through a 6-colour palette in DOM order
+   (grey → orange → warmblue → warmgreen → deepblue → brandgreen), then
+   repeats. Match that with an nth-child cycle over the institute slides. */
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)):nth-child(6n + 1) .carousel-slider-slide-content {
+  background-color: #263238;   /* bg-grey */
+}
+
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)):nth-child(6n + 2) .carousel-slider-slide-content {
+  background-color: #bf5300;   /* bg-orange */
+}
+
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)):nth-child(6n + 3) .carousel-slider-slide-content {
+  background-color: #00819d;   /* bg-warmblue */
+}
+
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)):nth-child(6n + 4) .carousel-slider-slide-content {
+  background-color: #96be2d;   /* bg-warmgreen */
+}
+
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)):nth-child(6n + 5) .carousel-slider-slide-content {
+  background-color: #00445f;   /* bg-deepblue */
+}
+
+.carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)):nth-child(6n) .carousel-slider-slide-content {
+  background-color: #006c66;   /* bg-brandgreen */
 }
 
 .carousel-slider .carousel-slider-slide:not(:has(.carousel-slider-slide-image picture)) .carousel-slider-slide-content p {

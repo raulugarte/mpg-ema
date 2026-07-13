@@ -112,16 +112,26 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/cards-news.js
   function parse3(element, { document: document2 }) {
-    const teasers = Array.from(element.querySelectorAll(".teaser"));
+    const teasers = Array.from(element.querySelectorAll(".teaser")).filter((t) => !t.closest(".slick-cloned"));
     if (teasers.length === 0) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const sectionTitleEl = element.querySelector(".linked_title h2, .linked_title h1, .linked_title h3");
+    let sectionTitleEl = element.querySelector(".linked_title h2, .linked_title h1, .linked_title h3");
+    if (!sectionTitleEl) {
+      const greyBand = element.closest(".container-full-width");
+      if (greyBand) {
+        sectionTitleEl = greyBand.querySelector(":scope > .container h2, :scope > .container h1");
+      }
+    }
     let sectionHeading = null;
     if (sectionTitleEl && sectionTitleEl.textContent.trim()) {
       sectionHeading = document2.createElement("h2");
       sectionHeading.textContent = sectionTitleEl.textContent.trim();
+      if (!element.contains(sectionTitleEl)) {
+        const wrapper = sectionTitleEl.closest(".row") || sectionTitleEl;
+        wrapper.remove();
+      }
     }
     const ctaLink = element.querySelector(".text-center a.btn, .text-center a[href]");
     let ctaPara = null;
@@ -139,7 +149,10 @@ var CustomImportScript = (() => {
       const title = textBox.querySelector("h3, h2, h4");
       const date = textBox.querySelector(".date, .data .attribute, .data");
       const tags = textBox.querySelector(".tags");
-      const description = textBox.querySelector(".description");
+      let description = teaser.querySelector(".description, p.select-correct-strong-color");
+      if (!description) {
+        description = Array.from(teaser.querySelectorAll(":scope p, .text-box > p")).find((p) => p.textContent.trim() && !p.closest(".meta-information")) || null;
+      }
       const imageCell = document2.createDocumentFragment();
       if (image) {
         imageCell.appendChild(document2.createComment(" field:image "));
@@ -161,7 +174,9 @@ var CustomImportScript = (() => {
       }
       cells.push([imageCell, textCell]);
     });
-    const block = WebImporter.Blocks.createBlock(document2, { name: "cards-news", cells });
+    const isRelatedStrip = element.id === "related-articles-container" || !!element.closest("#related-articles-container") || !!element.querySelector(".slick-slider, .slick-track, .slick-list");
+    const blockName = isRelatedStrip ? "cards-news (carousel)" : "cards-news";
+    const block = WebImporter.Blocks.createBlock(document2, { name: blockName, cells });
     const out = [];
     if (sectionHeading) out.push(sectionHeading);
     out.push(block);
@@ -418,6 +433,11 @@ var CustomImportScript = (() => {
   function transform(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
       removeAll(element, [".slick-cloned"]);
+      removeAll(element, [
+        "img.visible-print-block",
+        ".description.visible-print",
+        ".copyright.visible-print"
+      ]);
     }
     if (hookName === TransformHook.afterTransform) {
       removeAll(element, [
@@ -426,6 +446,24 @@ var CustomImportScript = (() => {
         "header.visible-print-block",
         "footer",
         ".pwa-settings-panel",
+        // Article/detail page chrome (see docblock). Precise selectors only — the
+        // related-articles band shares the .hidden-print class but is in scope.
+        "div.content.py-0",
+        // breadcrumb wrapper (holds only nav.hidden-print)
+        "nav.hidden-print",
+        // breadcrumb navigation list
+        "div.social-media-buttons",
+        // auto-generated share-widget row
+        "div.print-footer",
+        // print/editor chrome (Web-View, Print Page, Estimated DIN-A4)
+        "#go_to_live",
+        // editor overlay (Go to Editor View)
+        "#slick_container_js",
+        // fullscreen image-gallery lightbox (duplicated captions, Next/Esc)
+        ".fullscreen-slick",
+        // same gallery lightbox (class fallback if id differs at runtime)
+        ".slick-grid-close-icon",
+        // gallery close control (holds the stray "Esc" text)
         "iframe",
         "link",
         "noscript",
@@ -454,18 +492,77 @@ var CustomImportScript = (() => {
   function computeBlockName(name) {
     return name.replace(/-/g, " ").replace(/\s(.)/g, (s) => s.toUpperCase()).replace(/^(.)/g, (s) => s.toUpperCase());
   }
+  function styleMapFromTemplate(payload) {
+    const template = payload && payload.template;
+    if (!template) return null;
+    const realBlocks = Array.isArray(template.blocks) ? template.blocks.filter((b) => b && typeof b.name === "string" && !b.name.startsWith("section-")) : [];
+    function resolveBlockInstance(sectionSelectors, explicitBlock) {
+      for (let b = 0; b < realBlocks.length; b += 1) {
+        const rb = realBlocks[b];
+        if (explicitBlock && rb.name !== explicitBlock) continue;
+        const instances = Array.isArray(rb.instances) ? rb.instances : [];
+        for (let i = 0; i < instances.length; i += 1) {
+          const rbSel = instances[i];
+          const hit = sectionSelectors.some(
+            (secSel) => rbSel === secSel || rbSel.indexOf(secSel) !== -1 || secSel.indexOf(rbSel) !== -1
+          );
+          if (hit) return { block: rb.name, index: i };
+        }
+      }
+      if (explicitBlock) {
+        const rb = realBlocks.find((x) => x.name === explicitBlock);
+        if (rb) return { block: explicitBlock, index: 0 };
+      }
+      return null;
+    }
+    const rules = [];
+    if (Array.isArray(template.sections)) {
+      template.sections.forEach((section) => {
+        if (!section) return;
+        const style = section.style || section.section;
+        if (!style) return;
+        const selectors = Array.isArray(section.instances) ? section.instances : section.selector ? [section.selector] : [];
+        const resolved = resolveBlockInstance(selectors, section.block);
+        if (resolved) rules.push(__spreadProps(__spreadValues({}, resolved), { style }));
+      });
+    }
+    if (Array.isArray(template.blocks)) {
+      template.blocks.forEach((blockDef) => {
+        if (!blockDef || typeof blockDef.name !== "string") return;
+        if (!blockDef.name.startsWith("section-")) return;
+        const style = blockDef.style || blockDef.section;
+        if (!style) return;
+        const selectors = Array.isArray(blockDef.instances) ? blockDef.instances : [];
+        const resolved = resolveBlockInstance(selectors, blockDef.block);
+        if (resolved) rules.push(__spreadProps(__spreadValues({}, resolved), { style }));
+      });
+    }
+    if (rules.length === 0) return null;
+    const map = {};
+    rules.forEach(({ block, index, style }) => {
+      map[block] = map[block] || {};
+      map[block][index] = style;
+    });
+    return map;
+  }
   var BLOCK_NAME_BY_HEADER = Object.keys(BAND_STYLE_MAP).reduce((acc, name) => {
     acc[norm(computeBlockName(name))] = name;
     return acc;
   }, {});
+  function headerLookupFor(styleMap) {
+    return Object.keys(styleMap).reduce((acc, name) => {
+      acc[norm(computeBlockName(name))] = name;
+      return acc;
+    }, {});
+  }
   function blockTableHeaderName(table) {
     const firstRow = table.querySelector(":scope > tbody > tr, :scope > tr");
     if (!firstRow) return "";
     const th = firstRow.querySelector(":scope > th");
     if (!th) return "";
-    return norm(th.textContent);
+    return norm(th.textContent.replace(/\s*\([^)]*\)\s*$/, ""));
   }
-  function resolveStyledBands(element) {
+  function resolveStyledBands(element, styleMap, headerMap) {
     const doc = element.ownerDocument || document;
     const root = element || doc.body;
     const tables = Array.from(root.querySelectorAll("table"));
@@ -473,11 +570,11 @@ var CustomImportScript = (() => {
     const bands = [];
     tables.forEach((table) => {
       const header = blockTableHeaderName(table);
-      const blockName = BLOCK_NAME_BY_HEADER[header];
+      const blockName = headerMap[header];
       if (!blockName) return;
       const idx = perName[blockName] || 0;
       perName[blockName] = idx + 1;
-      const style = BAND_STYLE_MAP[blockName][idx];
+      const style = styleMap[blockName] && styleMap[blockName][idx];
       if (style) bands.push({ el: table, style });
     });
     return bands;
@@ -506,7 +603,10 @@ var CustomImportScript = (() => {
     if (hookName !== TransformHook2.afterTransform) return;
     const wi = getWebImporter();
     const doc = element.ownerDocument || document;
-    const bands = resolveStyledBands(element);
+    const templateMap = styleMapFromTemplate(payload);
+    const styleMap = templateMap || BAND_STYLE_MAP;
+    const headerMap = templateMap ? headerLookupFor(templateMap) : BLOCK_NAME_BY_HEADER;
+    const bands = resolveStyledBands(element, styleMap, headerMap);
     for (let i = bands.length - 1; i >= 0; i -= 1) {
       const { style, el } = bands[i];
       if (style) {
@@ -517,9 +617,16 @@ var CustomImportScript = (() => {
           el.parentNode.appendChild(meta);
         }
       }
-      if (el.previousElementSibling) {
+      let breakBefore = el;
+      const prev = el.previousElementSibling;
+      if (prev && /^H[1-6]$/.test(prev.tagName)) {
+        breakBefore = prev;
+      }
+      const allElements = Array.from((element || doc.body).querySelectorAll("*"));
+      const isFirstContent = allElements.indexOf(breakBefore) <= 0;
+      if (!isFirstContent) {
         const hr = doc.createElement("hr");
-        el.parentNode.insertBefore(hr, el);
+        breakBefore.parentNode.insertBefore(hr, breakBefore);
       }
     }
   }
